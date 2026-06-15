@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Privacy Policy - Progress Tracker</title>
+<link rel="icon" type="png" href="main icon.png">  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#050505;color:white;overflow-x:hidden;}
+
+/* ── NAVBAR ── */
+.navbar{width:100%;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 50px;background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);position:fixed;top:0;z-index:1000;}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.nav-left img{width:120px;height:auto;cursor:pointer;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.create-nav-btn{display:flex;align-items:center;gap:10px;padding:0 20px;height:40px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:13px;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:.3s;letter-spacing:.3px;box-shadow:0 0 20px rgba(0,255,136,.25);font-family:'Poppins',sans-serif;}
+.create-nav-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,136,.4);}
+.nav-icon-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;transition:.25s;font-size:16px;}
+.nav-icon-btn:hover{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:#00ff88;}
+.back-nav-btn{display:flex;align-items:center;gap:8px;padding:0 18px;height:40px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:13px;font-weight:500;border-radius:12px;cursor:pointer;transition:.25s;}
+.back-nav-btn:hover{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,.06);}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:-240px;width:240px;height:100vh;background:rgba(5,5,5,0.97);border-right:1px solid rgba(255,255,255,.06);z-index:99999;transition:.35s ease;display:flex;flex-direction:column;backdrop-filter:blur(20px);}
+.sidebar.open{left:0;}
+.sidebar-logo{display:flex;align-items:center;justify-content:center;padding:24px 20px 10px;border-bottom:1px solid rgba(255,255,255,.04);}
+.sidebar-logo img{width:130px;height:auto;}
+.side-menu{padding:14px 10px;overflow-y:auto;flex:1;}
+.side-item{width:100%;height:50px;display:flex;align-items:center;gap:12px;padding:0 14px;margin-bottom:6px;border-radius:14px;cursor:pointer;transition:.25s;color:#94a3b8;}
+.side-item.active{background:linear-gradient(90deg,rgba(0,255,136,.1),rgba(0,255,136,.04));border:1px solid rgba(0,255,136,.15);color:white;box-shadow:inset 3px 0 0 #00ff88;}
+.side-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);font-size:14px;color:#64748b;flex-shrink:0;transition:.25s;}
+.side-item.active .side-icon{background:rgba(0,255,136,.12);color:#00ff88;}
+.side-item:hover{background:rgba(255,255,255,.04);color:white;transform:translateX(3px);}
+.side-item:hover .side-icon{background:rgba(0,255,136,.08);color:#00ff88;}
+.side-item span{font-size:14px;font-weight:500;}
+.sidebar-bottom{padding:10px;border-top:1px solid rgba(255,255,255,.04);}
+.side-motivation-box{padding:14px;border-radius:14px;background:linear-gradient(145deg,rgba(255,170,0,.07),rgba(255,140,0,.03));border:1px solid rgba(255,170,0,.15);margin-bottom:10px;position:relative;overflow:hidden;}
+.side-motivation-box::before{content:'';position:absolute;width:80px;height:80px;top:-30px;right:-20px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,0,.15),transparent 70%);pointer-events:none;}
+.side-motivation-text{font-size:11px;color:#f59e0b;font-weight:500;line-height:1.5;margin-bottom:8px;}
+.side-motivation-quote{font-size:10px;color:#78716c;font-style:italic;line-height:1.4;transition:opacity .3s ease;}
+.side-logout-btn{width:100%;height:44px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:14px;cursor:pointer;transition:.25s;color:#ef4444;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.12);}
+.side-logout-btn:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);}
+.side-logout-btn .side-icon{background:rgba(239,68,68,.1);color:#ef4444;}
+.side-logout-btn span{font-size:14px;font-weight:500;}
+.side-close-outside{position:fixed;top:24px;left:190px;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.9);border:1px solid rgba(255,255,255,.12);color:white;font-size:22px;cursor:pointer;z-index:100000;backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:left .35s ease,opacity .25s ease;}
+.sidebar.open ~ .side-close-outside{left:250px;opacity:1;visibility:visible;}
+.side-close-outside:hover{border:1px solid rgba(255,255,255,0.236);background:rgba(30,29,29,0.816);transition:.3s ease;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.3s ease;z-index:1500;}
+.overlay.show{opacity:1;visibility:visible;}
+
+/* ── LOGOUT CONFIRM ── */
+.logout-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:20px;}
+.logout-confirm-overlay.show{display:flex;}
+@keyframes popupAnim{from{opacity:0;transform:scale(.95) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.logout-confirm-modal{width:100%;max-width:400px;background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px;text-align:center;animation:popupAnim .3s ease;}
+.logout-confirm-icon{width:60px;height:60px;border-radius:18px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:26px;color:#ef4444;margin:0 auto 18px;}
+.logout-confirm-title{font-size:20px;font-weight:700;color:#e2e8f0;margin-bottom:8px;}
+.logout-confirm-desc{font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.5;}
+.logout-confirm-btns{display:flex;gap:10px;}
+.logout-cancel-btn{flex:1;height:44px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:14px;font-weight:500;cursor:pointer;transition:.25s;font-family:'Poppins',sans-serif;}
+.logout-cancel-btn:hover{background:rgba(255,255,255,.08);color:white;}
+.logout-ok-btn{flex:1;height:44px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Poppins',sans-serif;}
+.logout-ok-btn:hover{transform:translateY(-1px);}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:auto;padding:100px 30px 60px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes cardPop{from{opacity:0;transform:translateY(20px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── PAGE HERO ── */
+.pp-hero{
+  position:relative;overflow:hidden;
+  padding:48px 48px 44px;
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(0,255,136,.05),rgba(0,255,136,.01));
+  border:1px solid rgba(0,255,136,.18);
+  margin-bottom:32px;
+  animation:fadeUp .7s ease forwards;
+}
+.pp-hero::before{content:'';position:absolute;width:320px;height:320px;top:-130px;right:-100px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.1),transparent 70%);pointer-events:none;}
+.pp-hero::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.5),transparent);}
+.pp-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;border-radius:20px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00ff88;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:18px;}
+.pp-hero h1{font-family:'Sora',sans-serif;font-size:38px;font-weight:700;letter-spacing:-1.5px;color:#f0f4f8;margin-bottom:12px;display:flex;align-items:center;gap:16px;}
+.pp-hero h1 i{font-size:32px;color:#00ff88;}
+.pp-hero-desc{font-size:14.5px;color:#64748b;line-height:1.75;max-width:700px;margin-bottom:22px;}
+.pp-meta{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.pp-meta-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#475569;}
+.pp-meta-item i{color:#00ff88;font-size:11px;}
+.pp-meta-item strong{color:#94a3b8;}
+
+/* ── TOC ── */
+.pp-toc{
+  padding:24px 28px;border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.07);
+  margin-bottom:28px;
+  animation:cardPop .6s .1s ease both;
+}
+.pp-toc-title{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.pp-toc-title i{color:#00ff88;}
+.pp-toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;}
+.pp-toc-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:.22s;text-decoration:none;}
+.pp-toc-item:hover{background:rgba(0,255,136,.05);border-color:rgba(0,255,136,.2);transform:translateX(4px);}
+.pp-toc-num{width:24px;height:24px;border-radius:7px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);color:#00ff88;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pp-toc-label{font-size:12.5px;color:#94a3b8;font-weight:500;transition:.22s;}
+.pp-toc-item:hover .pp-toc-label{color:#00ff88;}
+
+/* ── SECTIONS ── */
+.pp-section{
+  padding:28px 32px;border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.07);
+  margin-bottom:18px;
+  animation:cardPop .6s .15s ease both;
+  scroll-margin-top:90px;
+}
+.pp-section:hover{border-color:rgba(255,255,255,.11);}
+.pp-section-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.pp-section-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.pp-section-icon.green{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);color:#00ff88;}
+.pp-section-icon.blue{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#3b82f6;}
+.pp-section-icon.amber{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);color:#facc15;}
+.pp-section-icon.purple{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:#a855f7;}
+.pp-section-icon.red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;}
+.pp-section-icon.cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:#00e5ff;}
+.pp-section-icon.teal{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;}
+.pp-section-icon.rose{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.2);color:#fb7185;}
+.pp-section-title-wrap{flex:1;}
+.pp-section-num{font-size:10.5px;font-weight:600;color:#334155;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.pp-section-title{font-family:'Sora',sans-serif;font-size:19px;font-weight:700;color:#e2e8f0;letter-spacing:-.3px;}
+.pp-divider{width:100%;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.15),rgba(255,255,255,.04),transparent);margin-bottom:18px;}
+.pp-text{font-size:13.5px;color:#64748b;line-height:1.85;margin-bottom:14px;}
+.pp-text:last-child{margin-bottom:0;}
+.pp-text strong{color:#94a3b8;font-weight:600;}
+.pp-text a{color:#00ff88;text-decoration:none;}
+.pp-text a:hover{text-decoration:underline;}
+
+/* list items */
+.pp-list{margin:10px 0 14px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
+.pp-list li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#64748b;line-height:1.7;}
+.pp-list li::before{content:'';width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px rgba(0,255,136,.5);flex-shrink:0;margin-top:8px;}
+.pp-list li strong{color:#94a3b8;}
+
+/* highlight box */
+.pp-highlight{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-radius:13px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);margin:14px 0;}
+.pp-highlight i{color:#00ff88;font-size:14px;margin-top:2px;flex-shrink:0;}
+.pp-highlight span{font-size:12.5px;color:#64748b;line-height:1.65;}
+.pp-highlight.blue{background:rgba(59,130,246,.04);border-color:rgba(59,130,246,.15);}
+.pp-highlight.blue i{color:#3b82f6;}
+.pp-highlight.amber{background:rgba(250,204,21,.04);border-color:rgba(250,204,21,.15);}
+.pp-highlight.amber i{color:#facc15;}
+
+/* data table */
+.pp-data-table{width:100%;border-collapse:collapse;margin:14px 0;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);}
+.pp-data-table th{background:rgba(0,255,136,.06);color:#00ff88;font-size:11.5px;font-weight:700;padding:12px 16px;text-align:left;border-bottom:1px solid rgba(0,255,136,.15);text-transform:uppercase;letter-spacing:.5px;}
+.pp-data-table td{padding:11px 16px;font-size:12.5px;color:#64748b;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.6;}
+.pp-data-table tr:last-child td{border-bottom:none;}
+.pp-data-table tr:hover td{background:rgba(255,255,255,.02);}
+
+/* contact card */
+.pp-contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:14px;}
+.pp-contact-card{padding:18px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:6px;transition:.25s;}
+.pp-contact-card:hover{background:rgba(0,255,136,.04);border-color:rgba(0,255,136,.15);transform:translateY(-2px);}
+.pp-contact-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,255,136,.1);color:#00ff88;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:6px;}
+.pp-contact-label{font-size:11px;color:#334155;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.pp-contact-val{font-size:13px;color:#94a3b8;font-weight:500;}
+.pp-contact-val a{color:#00ff88;text-decoration:none;}
+
+/* last updated banner */
+.pp-updated-banner{display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:14px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);margin-bottom:28px;animation:cardPop .6s .05s ease both;}
+.pp-updated-icon{width:38px;height:38px;border-radius:10px;background:rgba(0,255,136,.1);color:#00ff88;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.pp-updated-text{font-size:13px;color:#64748b;}
+.pp-updated-text strong{color:#00ff88;}
+
+/* ── FOOTER ── */
+.footer{margin-top:60px;padding:28px 0 16px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+.footer-top{display:flex;align-items:center;justify-content:center;gap:30px;margin-bottom:16px;flex-wrap:wrap;}
+.footer-link{color:#475569;font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.footer-link:hover{color:#00ff88;}
+.footer-copy{font-size:12px;color:#334155;}
+
+/* scroll to top */
+.scroll-top-btn{position:fixed;bottom:32px;right:32px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#00d4aa);border:none;color:#050505;font-size:18px;cursor:pointer;z-index:9000;box-shadow:0 4px 20px rgba(0,255,136,.35);opacity:0;visibility:hidden;transition:.3s;display:flex;align-items:center;justify-content:center;}
+.scroll-top-btn.show{opacity:1;visibility:visible;}
+.scroll-top-btn:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,255,136,.5);}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Picsart_26-05-19_08-40-08-746.png" onclick="window.location.href='index.html'">
+  </div>
+  <div class="side-menu">
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-house"></i></div><span>Home</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-calendar-days"></i></div><span>Calendar</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-trophy"></i></div><span>Achievements</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='saved.html'">
+      <div class="side-icon"><i class="fa-solid fa-bookmark"></i></div><span>Saved</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-clock-rotate-left"></i></div><span>History</span>
+    </div>
+    <div class="side-item active">
+      <div class="side-icon"><i class="fa-solid fa-shield-halved"></i></div><span>Privacy Policy</span>
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="side-motivation-box">
+      <div class="side-motivation-text">🔒 Your data is safe</div>
+      <div class="side-motivation-quote" id="sideMotivationQuote">We never sell your data to anyone.</div>
+    </div>
+    <div class="side-logout-btn" onclick="showLogoutConfirm()">
+      <div class="side-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+      <span>Logout</span>
+    </div>
+  </div>
+</div>
+
+<div class="side-close-outside" onclick="toggleSidebar()">
+  <i class="fa-solid fa-xmark"></i>
+</div>
+<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+<!-- ── NAVBAR ── -->
+<div class="navbar">
+  <div class="nav-left">
+<button class="back-nav-btn" onclick="window.history.back()">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>  </div>
+
+</div>
+
+<!-- LOGOUT CONFIRM -->
+<div id="logoutConfirm" class="logout-confirm-overlay">
+  <div class="logout-confirm-modal">
+    <div class="logout-confirm-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+    <div class="logout-confirm-title">Logout?</div>
+    <div class="logout-confirm-desc">Are you sure you want to log out of Progress Tracker?</div>
+    <div class="logout-confirm-btns">
+      <button class="logout-cancel-btn" onclick="closeLogoutConfirm()">Cancel</button>
+      <button class="logout-ok-btn" onclick="confirmLogout()">Yes, Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+<div class="main">
+
+  <!-- LAST UPDATED BANNER -->
+  <div class="pp-updated-banner">
+    <div class="pp-updated-icon"><i class="fa-regular fa-clock"></i></div>
+    <div class="pp-updated-text">
+      Last updated: <strong>June 01, 2026</strong> &nbsp;·&nbsp; Effective immediately upon use of Progress Tracker.
+      This policy applies to all users of the Progress Tracker web application.
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="pp-hero">
+    <div class="pp-hero-badge"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</div>
+    <h1><i class="fa-solid fa-lock"></i> Your Privacy, Our Priority</h1>
+    <p class="pp-hero-desc">
+      Progress Tracker is built with a simple belief — your data belongs to you. We are committed to being transparent about what we collect, why we collect it, and how it is used. This Privacy Policy explains our practices in plain language so you always know where you stand.
+    </p>
+    <div class="pp-meta">
+      <div class="pp-meta-item"><i class="fa-solid fa-map-pin"></i><strong>Jurisdiction:</strong> India</div>
+      <div class="pp-meta-item"><i class="fa-solid fa-user-shield"></i><strong>Data Controller:</strong> Progress Tracker</div>
+      <div class="pp-meta-item"><i class="fa-solid fa-file-contract"></i><strong>Version:</strong> 2.0</div>
+      <div class="pp-meta-item"><i class="fa-solid fa-language"></i><strong>Language:</strong> English</div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="pp-toc">
+    <div class="pp-toc-title"><i class="fa-solid fa-list-ul"></i> Table of Contents</div>
+    <div class="pp-toc-grid">
+      <a href="#s1" class="pp-toc-item"><div class="pp-toc-num">1</div><span class="pp-toc-label">Information We Collect</span></a>
+      <a href="#s2" class="pp-toc-item"><div class="pp-toc-num">2</div><span class="pp-toc-label">How We Use Your Information</span></a>
+      <a href="#s3" class="pp-toc-item"><div class="pp-toc-num">3</div><span class="pp-toc-label">Local Storage & Data Storage</span></a>
+      <a href="#s4" class="pp-toc-item"><div class="pp-toc-num">4</div><span class="pp-toc-label">Data Sharing & Third Parties</span></a>
+      <a href="#s5" class="pp-toc-item"><div class="pp-toc-num">5</div><span class="pp-toc-label">Cookies & Tracking</span></a>
+      <a href="#s6" class="pp-toc-item"><div class="pp-toc-num">6</div><span class="pp-toc-label">Data Security</span></a>
+      <a href="#s7" class="pp-toc-item"><div class="pp-toc-num">7</div><span class="pp-toc-label">Your Rights & Choices</span></a>
+      <a href="#s8" class="pp-toc-item"><div class="pp-toc-num">8</div><span class="pp-toc-label">Children's Privacy</span></a>
+      <a href="#s9" class="pp-toc-item"><div class="pp-toc-num">9</div><span class="pp-toc-label">Data Retention</span></a>
+      <a href="#s10" class="pp-toc-item"><div class="pp-toc-num">10</div><span class="pp-toc-label">Changes to This Policy</span></a>
+      <a href="#s11" class="pp-toc-item"><div class="pp-toc-num">11</div><span class="pp-toc-label">Contact Us</span></a>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Information We Collect -->
+  <div class="pp-section" id="s1">
+    <div class="pp-section-header">
+      <div class="pp-section-icon green"><i class="fa-solid fa-database"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 01</div>
+        <div class="pp-section-title">Information We Collect</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Progress Tracker is designed as a <strong>client-side application</strong>. This means the vast majority of your data never leaves your device. Here is a breakdown of what we may collect:</p>
+
+    <table class="pp-data-table">
+      <thead>
+        <tr><th>Data Type</th><th>What It Includes</th><th>Where It's Stored</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Progress Data</strong></td><td>Goal names, dates, daily notes, completion status</td><td>Your browser (localStorage)</td></tr>
+        <tr><td><strong>App Preferences</strong></td><td>Filter settings, pinned progress, favorites, notification state</td><td>Your browser (localStorage)</td></tr>
+        <tr><td><strong>Authentication State</strong></td><td>Login flag ("loggedIn" key) — no passwords stored</td><td>Your browser (localStorage)</td></tr>
+        <tr><td><strong>Search History</strong></td><td>Recent search keywords within the app</td><td>Your browser (localStorage)</td></tr>
+        <tr><td><strong>Usage Analytics</strong></td><td>Currently not collected</td><td>Not applicable</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pp-highlight">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>We do <strong>not</strong> collect your name, email address, phone number, payment information, or any personally identifiable information (PII) through the core application at this time.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 2: How We Use Your Information -->
+  <div class="pp-section" id="s2">
+    <div class="pp-section-header">
+      <div class="pp-section-icon blue"><i class="fa-solid fa-gears"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 02</div>
+        <div class="pp-section-title">How We Use Your Information</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">All data stored in your browser is used exclusively to provide and improve your experience within Progress Tracker. Specifically:</p>
+    <ul class="pp-list">
+      <li><strong>Progress tracking:</strong> To display your goals, daily completion statuses, streaks, and analytics.</li>
+      <li><strong>App functionality:</strong> To remember your pinned progress, favorites, filter preferences, and notification states across sessions.</li>
+      <li><strong>Performance insights:</strong> To calculate your consistency rate, best streak, weekly comparisons, and achievement progress.</li>
+      <li><strong>Notifications:</strong> To generate in-app alerts (e.g., deadline reminders, streak alerts) based on your progress data — all computed locally.</li>
+      <li><strong>Search experience:</strong> To remember your recent search keywords so you can quickly access past searches.</li>
+    </ul>
+    <div class="pp-highlight blue">
+      <i class="fa-solid fa-info-circle"></i>
+      <span>None of your usage data is transmitted to any external server for behavioral profiling, advertising, or resale. All computations happen entirely in your browser.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Local Storage -->
+  <div class="pp-section" id="s3">
+    <div class="pp-section-header">
+      <div class="pp-section-icon amber"><i class="fa-solid fa-hard-drive"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 03</div>
+        <div class="pp-section-title">Local Storage & Data Storage</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Progress Tracker uses your browser's <strong>localStorage API</strong> to persist your data between sessions. This is similar to how a desktop application saves files on your computer — except it lives in your browser.</p>
+    <p class="pp-text">The following keys are stored in your browser's localStorage:</p>
+    <ul class="pp-list">
+      <li><strong>allProgress</strong> — Your complete list of progress goals and daily entries.</li>
+      <li><strong>pinnedProgress / favoriteProgress</strong> — IDs of goals you've pinned or starred.</li>
+      <li><strong>deletedHistory</strong> — A log of progress goals you have deleted (kept for the History view).</li>
+      <li><strong>recentlyOpened</strong> — The last 5 progress goals you opened.</li>
+      <li><strong>progressNotifs</strong> — In-app notification objects.</li>
+      <li><strong>recentSearches</strong> — Up to 5 recent search keywords.</li>
+      <li><strong>loggedIn</strong> — A simple flag ("true") indicating you are logged in.</li>
+      <li><strong>notifiedStartIds / notifiedCompleteIds / notifiedDeadlineIds</strong> — IDs used to avoid duplicate notifications.</li>
+    </ul>
+    <div class="pp-highlight amber">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span><strong>Important:</strong> Clearing your browser's site data or localStorage will permanently delete all your progress data. We recommend exporting or backing up your data regularly if this concerns you. This data is not recoverable once cleared.</span>
+    </div>
+    <p class="pp-text">Your localStorage data is isolated to the domain where Progress Tracker is hosted. No other website can access it.</p>
+  </div>
+
+  <!-- SECTION 4: Data Sharing -->
+  <div class="pp-section" id="s4">
+    <div class="pp-section-header">
+      <div class="pp-section-icon purple"><i class="fa-solid fa-share-nodes"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 04</div>
+        <div class="pp-section-title">Data Sharing & Third Parties</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">We take your privacy seriously. Here is our clear commitment regarding data sharing:</p>
+    <ul class="pp-list">
+      <li>We <strong>do not sell</strong> your personal data to any third party — ever.</li>
+      <li>We <strong>do not share</strong> your progress data with advertisers, marketers, or data brokers.</li>
+      <li>We <strong>do not use</strong> third-party analytics SDKs (such as Google Analytics, Mixpanel, etc.) in the core application at this time.</li>
+      <li>We <strong>do not send</strong> your goal data to any backend server or cloud database in the current version of the app.</li>
+    </ul>
+    <p class="pp-text">The only external resources loaded by Progress Tracker are:</p>
+    <table class="pp-data-table">
+      <thead>
+        <tr><th>Resource</th><th>Provider</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Font Awesome Icons</td><td>cdnjs.cloudflare.com</td><td>UI icons — no user data shared</td></tr>
+        <tr><td>Google Fonts (Poppins, Sora)</td><td>fonts.googleapis.com</td><td>Typography — standard font loading</td></tr>
+        <tr><td>Chart.js</td><td>cdn.jsdelivr.net</td><td>Progress charts — runs locally, no data sent</td></tr>
+      </tbody>
+    </table>
+    <p class="pp-text">These CDN resources may log your IP address as part of standard HTTP request logging by those providers. Please refer to their respective privacy policies for details.</p>
+  </div>
+
+  <!-- SECTION 5: Cookies -->
+  <div class="pp-section" id="s5">
+    <div class="pp-section-header">
+      <div class="pp-section-icon cyan"><i class="fa-solid fa-cookie-bite"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 05</div>
+        <div class="pp-section-title">Cookies & Tracking</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Progress Tracker does <strong>not</strong> use browser cookies (<code style="background:rgba(255,255,255,.06);padding:2px 7px;border-radius:5px;font-size:12px;color:#00ff88;">document.cookie</code>) for any purpose. We rely solely on <strong>localStorage</strong> for data persistence.</p>
+    <ul class="pp-list">
+      <li>No advertising cookies are set.</li>
+      <li>No tracking pixels or beacon scripts are used.</li>
+      <li>No fingerprinting techniques are employed.</li>
+      <li>No cross-site tracking occurs.</li>
+    </ul>
+    <div class="pp-highlight">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>You will never see a cookie consent banner on Progress Tracker because we simply do not use tracking cookies. Your browsing activity within the app stays entirely on your device.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Data Security -->
+  <div class="pp-section" id="s6">
+    <div class="pp-section-header">
+      <div class="pp-section-icon red"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 06</div>
+        <div class="pp-section-title">Data Security</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Because Progress Tracker operates entirely client-side, your data security is primarily governed by your own device and browser security. We implement the following best practices:</p>
+    <ul class="pp-list">
+      <li><strong>HTTPS enforcement:</strong> The application is served over HTTPS to prevent man-in-the-middle attacks during page load.</li>
+      <li><strong>No server-side storage:</strong> Since your data never leaves your browser in the current version, there is no server-side database to be breached.</li>
+      <li><strong>No external authentication:</strong> Login state is managed via a simple localStorage flag. We recommend only using Progress Tracker on trusted personal devices.</li>
+      <li><strong>Script integrity:</strong> External scripts are loaded from reputable, widely-trusted CDNs.</li>
+    </ul>
+    <div class="pp-highlight amber">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span><strong>Your responsibility:</strong> Do not use Progress Tracker on shared or public computers where others may access your browser's localStorage. Always log out when using a shared device to protect your data.</span>
+    </div>
+    <p class="pp-text">While we take reasonable steps to secure the application code, no software system is completely immune to security risks. We encourage you to keep your browser and operating system updated.</p>
+  </div>
+
+  <!-- SECTION 7: Your Rights -->
+  <div class="pp-section" id="s7">
+    <div class="pp-section-header">
+      <div class="pp-section-icon teal"><i class="fa-solid fa-user-check"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 07</div>
+        <div class="pp-section-title">Your Rights & Choices</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">You have complete control over your data within Progress Tracker. Here is what you can do at any time:</p>
+    <ul class="pp-list">
+      <li><strong>Access your data:</strong> All your progress data is visible within the app. You can view any goal, day entry, or note at any time.</li>
+      <li><strong>Delete individual progress:</strong> Use the Delete option on any progress card to remove it permanently. Deleted items move to your History view.</li>
+      <li><strong>Clear all data:</strong> Open your browser's Developer Tools → Application → Local Storage → clear all keys related to Progress Tracker to wipe everything.</li>
+      <li><strong>Clear history:</strong> Use the "Clear History" button inside the History popup to erase your deleted progress log.</li>
+      <li><strong>Clear notifications:</strong> Use the "Clear All" button in the Notifications popup to remove all in-app notifications.</li>
+      <li><strong>Clear search history:</strong> Use the "Clear All" option in the Quick Search popup to remove recent searches.</li>
+      <li><strong>Opt out:</strong> Simply stop using the application. Your data remains in your browser's localStorage until you clear it.</li>
+    </ul>
+    <div class="pp-highlight">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Since all data is stored locally on your device, you are always in full control. There is no account to deactivate and no server-side data deletion request needed.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 8: Children's Privacy -->
+  <div class="pp-section" id="s8">
+    <div class="pp-section-header">
+      <div class="pp-section-icon rose"><i class="fa-solid fa-child"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 08</div>
+        <div class="pp-section-title">Children's Privacy</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Progress Tracker is intended for users who are <strong>13 years of age or older</strong>. We do not knowingly collect personal information from children under 13.</p>
+    <p class="pp-text">Because the application does not require account registration or collect PII, there is minimal risk of inadvertent data collection from minors. However, we recommend that parents and guardians supervise their children's use of any web application.</p>
+    <p class="pp-text">If you believe a child under 13 has somehow provided personal information through a feedback or support form associated with this application, please contact us immediately and we will take appropriate steps to remove such information.</p>
+  </div>
+
+  <!-- SECTION 9: Data Retention -->
+  <div class="pp-section" id="s9">
+    <div class="pp-section-header">
+      <div class="pp-section-icon blue"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 09</div>
+        <div class="pp-section-title">Data Retention</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">Your progress data is retained in your browser's localStorage <strong>indefinitely</strong> — it persists until you explicitly clear it. There is no automatic expiration of data.</p>
+    <table class="pp-data-table">
+      <thead>
+        <tr><th>Data</th><th>Retention Period</th><th>How to Delete</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Progress goals & entries</td><td>Until manually deleted or localStorage cleared</td><td>Delete button in app or clear localStorage</td></tr>
+        <tr><td>Deleted progress (History)</td><td>Up to 50 entries, until cleared</td><td>"Clear History" button in History popup</td></tr>
+        <tr><td>Notifications</td><td>Until cleared by user</td><td>"Clear All" in Notifications popup</td></tr>
+        <tr><td>Recent searches</td><td>Up to 5 entries, until cleared</td><td>"Clear All" in Search popup</td></tr>
+        <tr><td>Recently opened</td><td>Last 5 opened goals</td><td>Clears automatically on oldest entry</td></tr>
+        <tr><td>Login state</td><td>Until logout</td><td>Logout button</td></tr>
+      </tbody>
+    </table>
+    <p class="pp-text">We do not retain any data on our servers because no data is transmitted to our servers in the current version of the application.</p>
+  </div>
+
+  <!-- SECTION 10: Changes to Policy -->
+  <div class="pp-section" id="s10">
+    <div class="pp-section-header">
+      <div class="pp-section-icon amber"><i class="fa-solid fa-pen-to-square"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 10</div>
+        <div class="pp-section-title">Changes to This Policy</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or app features. When we make significant changes, we will:</p>
+    <ul class="pp-list">
+      <li>Update the <strong>"Last Updated"</strong> date at the top of this page.</li>
+      <li>Display an in-app notification alerting you to the policy update.</li>
+      <li>If changes are material, we may add a prominent notice on the main dashboard.</li>
+    </ul>
+    <p class="pp-text">Your continued use of Progress Tracker after any changes to this Privacy Policy constitutes your acceptance of the updated terms. We encourage you to review this page periodically to stay informed.</p>
+    <div class="pp-highlight">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>We will never make changes to this policy that reduce your privacy rights without clearly communicating those changes and giving you time to review them.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 11: Contact -->
+  <div class="pp-section" id="s11">
+    <div class="pp-section-header">
+      <div class="pp-section-icon green"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <div class="pp-section-title-wrap">
+        <div class="pp-section-num">Section 11</div>
+        <div class="pp-section-title">Contact Us</div>
+      </div>
+    </div>
+    <div class="pp-divider"></div>
+    <p class="pp-text">If you have any questions, concerns, or requests regarding this Privacy Policy or the handling of your data, please don't hesitate to reach out. We aim to respond within <strong>48 hours</strong> on business days.</p>
+    <div class="pp-contact-grid">
+      <div class="pp-contact-card">
+        <div class="pp-contact-icon"><i class="fa-regular fa-envelope"></i></div>
+        <div class="pp-contact-label">Support Email</div>
+        <div class="pp-contact-val"><a href="support.html">Visit Support Page</a></div>
+      </div>
+      <div class="pp-contact-card">
+        <div class="pp-contact-icon"><i class="fa-regular fa-comment-dots"></i></div>
+        <div class="pp-contact-label">Feedback</div>
+        <div class="pp-contact-val"><a href="feedback.html">Submit Feedback</a></div>
+      </div>
+      <div class="pp-contact-card">
+        <div class="pp-contact-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="pp-contact-label">Terms & Conditions</div>
+        <div class="pp-contact-val"><a href="termsandconditions.html">Read Terms</a></div>
+      </div>
+      <div class="pp-contact-card">
+        <div class="pp-contact-icon"><i class="fa-solid fa-house"></i></div>
+        <div class="pp-contact-label">Main Dashboard</div>
+        <div class="pp-contact-val"><a href="index.html">Go to Home</a></div>
+      </div>
+    </div>
+    <p class="pp-text" style="margin-top:18px;">When contacting us, please include a description of your concern so we can assist you as efficiently as possible. We respect your privacy in all correspondence.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-top">
+      <a href="support.html" class="footer-link"><i class="fa-regular fa-envelope"></i> Support</a>
+      <a href="feedback.html" class="footer-link"><i class="fa-regular fa-comment-dots"></i> Feedback</a>
+      <a href="termsandconditions.html" class="footer-link"><i class="fa-solid fa-file-lines"></i> Terms &amp; Conditions</a>
+      <a href="privacypolicy.html" class="footer-link"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a>
+    </div>
+    <div class="footer-copy">© Progress Tracker 2026 — All Rights Reserved &nbsp;·&nbsp; Your data stays on your device.</div>
+  </div>
+
+</div>
+
+<script>
+function lockScroll(){document.body.style.overflow="hidden";}
+function unlockScroll(){document.body.style.overflow="";}
+
+function toggleSidebar(){
+  let s=document.getElementById("sidebar"),o=document.getElementById("overlay");
+  s.classList.toggle("open");o.classList.toggle("show");
+  if(s.classList.contains("open")) lockScroll(); else unlockScroll();
+}
+
+function showLogoutConfirm(){document.getElementById("logoutConfirm").classList.add("show");lockScroll();}
+function closeLogoutConfirm(){document.getElementById("logoutConfirm").classList.remove("show");unlockScroll();}
+function confirmLogout(){localStorage.removeItem("loggedIn");window.location.href="login.html";}
+
+/* scroll to top */
+window.addEventListener("scroll",()=>{
+  let btn=document.getElementById("scrollTopBtn");
+  if(window.scrollY>320) btn.classList.add("show");
+  else btn.classList.remove("show");
+});
+
+/* sidebar motivation quotes */
+const sideQuotes=["We never sell your data to anyone.","Your progress stays on your device.","Privacy is a right, not a feature.","You own every byte of your data.","Transparency builds trust."];
+let sideQIdx=0;
+function rotateSideQuote(){
+  sideQIdx=(sideQIdx+1)%sideQuotes.length;
+  let el=document.getElementById("sideMotivationQuote");
+  if(el){el.style.opacity="0";setTimeout(()=>{el.innerText=sideQuotes[sideQIdx];el.style.opacity="1";},300);}
+}
+setInterval(rotateSideQuote,5000);
+
+/* smooth scroll for TOC links */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener("click",e=>{
+    e.preventDefault();
+    let target=document.querySelector(a.getAttribute("href"));
+    if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+});
+</script>
+</body>
+</html>

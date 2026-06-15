@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Support Center - Progress Tracker</title>
+  <link rel="icon" type="png" href="main icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+    body{background:#050505;color:white;min-height:100vh;overflow-x:hidden;padding-top:50px;}
+
+    /* ── BACKGROUND GLOW ── */
+    body::before{
+      content:"";position:fixed;inset:0;
+      background:radial-gradient(circle at top left,rgba(0,255,136,0.06),transparent 30%),
+                 radial-gradient(circle at bottom right,rgba(0,255,136,0.04),transparent 30%);
+      z-index:-1;pointer-events:none;
+    }
+
+    /* ── HEADER ── */
+    .top-header{
+      width:100%;height:70px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 60px;
+      background:rgba(5,5,5,0.75);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      position:fixed;top:0;z-index:100;
+    }
+    .back-btn{
+      display:flex;align-items:center;gap:10px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      color:white;padding:0 18px;height:40px;border-radius:12px;
+      font-size:13px;font-weight:500;cursor:pointer;
+      transition:.25s;text-decoration:none;font-family:'Poppins',sans-serif;
+    }
+    .back-btn:hover{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:#00ff88;transform:translateX(-2px);}
+    .back-btn i{font-size:13px;}
+    .header-title{
+      font-size:16px;font-weight:600;color:#e2e8f0;
+      display:flex;align-items:center;gap:10px;
+    }
+    .header-title i{color:#00ff88;font-size:15px;}
+    .header-spacer{width:120px;}
+
+    /* ── MAIN ── */
+    .main{max-width:1100px;margin:auto;padding:70px 50px 80px;}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes cardPop{from{opacity:0;transform:translateY(30px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+    /* ── HERO SECTION ── */
+    .hero-section{margin-bottom:50px;animation:fadeUp .8s ease forwards;}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);color:#00ff88;font-size:12px;font-weight:600;letter-spacing:1px;margin-bottom:22px;}
+    .support-icon{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#00ff88;margin-bottom:22px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);box-shadow:0 0 30px rgba(0,255,136,.15);}
+    .hero-section h1{font-size:52px;line-height:1.1;margin-bottom:14px;font-weight:700;letter-spacing:-2px;}
+    .hero-section h1 span{color:#00ff88;}
+    .hero-section p{color:#64748b;font-size:17px;line-height:1.7;max-width:580px;}
+
+    /* ── SUPPORT CARDS ── */
+    .support-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:28px;animation:cardPop .7s .1s ease both;}
+    .support-card{
+      background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:28px;
+      transition:.3s;position:relative;overflow:hidden;
+    }
+    .support-card::after{content:"";position:absolute;width:120px;height:120px;top:-50px;right:-50px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.07),transparent 70%);pointer-events:none;}
+    .support-card:hover{transform:translateY(-5px);border-color:rgba(0,255,136,.2);box-shadow:0 0 35px rgba(0,255,136,.06);}
+    .card-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.12);color:#00ff88;font-size:22px;margin-bottom:20px;box-shadow:0 0 18px rgba(0,255,136,.12);}
+    .support-card h2{font-size:22px;font-weight:700;margin-bottom:10px;color:#e2e8f0;}
+    .support-card p{color:#64748b;line-height:1.8;margin-bottom:22px;font-size:14px;}
+    .card-btn{height:44px;padding:0 22px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;transition:.3s;font-family:'Poppins',sans-serif;box-shadow:0 0 18px rgba(0,255,136,.2);}
+    .card-btn:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(0,255,136,.38);}
+
+    /* ── CONTACT BOX ── */
+    .contact-box{
+      width:100%;
+      background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));
+      border-radius:22px;border:1px solid rgba(255,255,255,.06);
+      padding:28px 32px;margin-bottom:28px;
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;
+      animation:cardPop .7s .2s ease both;
+    }
+    .contact-item{display:flex;align-items:center;gap:16px;}
+    .contact-circle{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#00ff88;border:1px solid rgba(0,255,136,.15);background:rgba(0,255,136,.06);box-shadow:0 0 14px rgba(0,255,136,.1);}
+    .contact-item h3{margin-bottom:4px;font-size:15px;font-weight:600;color:#e2e8f0;}
+    .contact-item p{color:#00ff88;font-size:13px;font-weight:500;}
+
+    /* ── FAQ ── */
+    .faq-section{animation:cardPop .7s .3s ease both;}
+    .faq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+    .faq-title{font-size:26px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:12px;}
+    .faq-title i{color:#facc15;font-size:22px;}
+    .faq-sub{font-size:13px;color:#475569;}
+    .faq-container{display:flex;flex-direction:column;gap:12px;}
+    .faq-box{
+      background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));
+      border-radius:18px;border:1px solid rgba(255,255,255,.06);overflow:hidden;transition:.3s;
+    }
+    .faq-box:hover{border-color:rgba(255,255,255,.1);}
+    .faq-box.active{border-color:rgba(0,255,136,.2);box-shadow:0 0 20px rgba(0,255,136,.05);}
+    .faq-question{
+      width:100%;background:none;border:none;outline:none;
+      color:#e2e8f0;display:flex;align-items:center;justify-content:space-between;
+      padding:22px 24px;cursor:pointer;font-size:15px;font-weight:500;
+      gap:16px;text-align:left;font-family:'Poppins',sans-serif;transition:.25s;
+    }
+    .faq-question i{color:#00ff88;transition:.3s;font-size:13px;flex-shrink:0;}
+    .faq-box.active .faq-question{color:#00ff88;}
+    .faq-box.active .faq-question i{transform:rotate(180deg);}
+    .faq-answer{
+      max-height:0;overflow:hidden;transition:.35s ease;
+      color:#64748b;line-height:1.9;padding:0 24px;font-size:14px;
+    }
+    .faq-box.active .faq-answer{max-height:250px;padding:0 24px 22px;}
+
+    /* ── REPORT BOX ── */
+    .report-box{
+      margin-top:28px;
+      background:linear-gradient(135deg,rgba(0,255,136,.06),rgba(0,255,136,.02));
+      border:1px solid rgba(0,255,136,.15);border-radius:22px;
+      padding:32px 36px;display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:24px;animation:cardPop .7s .4s ease both;
+    }
+    .report-box h2{font-size:26px;font-weight:700;margin-bottom:8px;color:#e2e8f0;}
+    .report-box p{color:#64748b;font-size:14px;}
+    .report-btn{
+      height:50px;padding:0 28px;border:none;cursor:pointer;border-radius:14px;
+      background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;
+      font-size:14px;font-weight:700;transition:.3s;
+      box-shadow:0 0 22px rgba(0,255,136,.25);font-family:'Poppins',sans-serif;
+    }
+    .report-btn:hover{transform:translateY(-2px);box-shadow:0 0 32px rgba(0,255,136,.4);}
+
+    /* ── FOOTER ── */
+    .footer{margin-top:60px;padding:28px 0 16px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+    .footer-top{display:flex;align-items:center;justify-content:center;gap:30px;margin-bottom:16px;flex-wrap:wrap;}
+    .footer-link{color:#475569;font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+    .footer-link:hover{color:#00ff88;}
+    .footer-copy{font-size:12px;color:#334155;}
+
+    @media(max-width:768px){
+      .top-header{padding:0 20px;}
+      .header-spacer{width:40px;}
+      .main{padding:60px 20px 60px;}
+      .hero-section h1{font-size:36px;}
+      .hero-section p{font-size:15px;}
+      .faq-title{font-size:22px;}
+      .report-box h2{font-size:22px;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="top-header">
+<a href="#" class="back-btn" onclick="goBack()">
+  <i class="fa-solid fa-arrow-left"></i> Back
+</a>
+    <div class="header-title">
+      <i class="fa-solid fa-headset"></i> Support Center
+    </div>
+    <div class="header-spacer"></div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero-section">
+      <div class="hero-tag"><i class="fa-solid fa-headset"></i> SUPPORT CENTER</div>
+      <div class="support-icon"><i class="fa-solid fa-headset"></i></div>
+      <h1>Support <span>Center</span></h1>
+      <p>Need help? We're here to assist you with your progress, feedback, issues and questions.</p>
+    </section>
+
+    <!-- SUPPORT CARDS -->
+    <section class="support-cards">
+      <div class="support-card">
+        <div class="card-icon"><i class="fa-regular fa-envelope"></i></div>
+        <h2>Contact Support</h2>
+        <p>Get in touch with our support team for help and assistance with any issues you face.</p>
+        <button class="card-btn" onclick="window.open('https://mail.google.com/mail/?view=cm&fs=1&to=support.progresstracker@gmail.com')">
+          Email Us
+        </button>
+      </div>
+      <div class="support-card">
+        <div class="card-icon"><i class="fa-regular fa-message"></i></div>
+        <h2>Report a Problem</h2>
+        <p>Found a bug or issue in the tracker? Let us know and we'll fix it in the next update.</p>
+        <button class="card-btn" onclick="window.location.href='feedback.html'">
+          Report Now
+        </button>
+      </div>
+      <div class="support-card">
+        <div class="card-icon"><i class="fa-regular fa-circle-question"></i></div>
+        <h2>FAQ</h2>
+        <p>Find quick answers to common questions about features, data, and how the app works.</p>
+        <button class="card-btn" onclick="document.querySelector('.faq-section').scrollIntoView({behavior:'smooth'})">
+          View FAQ
+        </button>
+      </div>
+    </section>
+
+    <!-- CONTACT BOX -->
+    <section class="contact-box">
+      <div class="contact-item">
+        <div class="contact-circle"><i class="fa-regular fa-envelope"></i></div>
+        <div>
+          <h3>Email</h3>
+          <p>support.progresstracker@gmail.com</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-circle"><i class="fa-regular fa-clock"></i></div>
+        <div>
+          <h3>Response Time</h3>
+          <p>Within 24 hours</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-circle"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <h3>Data Privacy</h3>
+          <p>Your data stays on your device</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-circle"><i class="fa-solid fa-code-branch"></i></div>
+        <div>
+          <h3>Version</h3>
+          <p>Progress Tracker v1.0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+      <div class="faq-header">
+        <div class="faq-title">
+          <i class="fa-solid fa-circle-question"></i>
+          Frequently Asked Questions
+        </div>
+        <div class="faq-sub">Click any question to expand the answer</div>
+      </div>
+
+      <div class="faq-container">
+
+        <div class="faq-box active">
+          <button class="faq-question">
+            How do I save my progress?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Your progress is automatically saved to your device's local storage as you update your tasks and goals inside the tracker. There's no need to manually save — every mark you complete or skip is stored instantly.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            How do I create a new progress tracker?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Click the "New Progress" button in the top navbar or the "Create Progress" button on the home page. Enter a name, set a start and end date, and your tracker will be ready to use immediately.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            How does the Analytics page work?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            The Analytics page gives you a full performance overview — including completion rate over time, consistency heatmap, goal progress list, streak tracker, and smart insights. It reads all your progress data and visualises it with charts and meters.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            What is a streak and how is it calculated?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            A streak is a consecutive chain of days where you've marked your progress as "complete." Missing even one day resets the streak. Your current streak and best-ever streak are both tracked and shown in the Analytics section.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            Can I pin a progress to the top of my list?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Yes! Click the three-dot menu (⋮) on any progress card and select "Pin to Top." Pinned progress will always appear at the top of your list with a yellow pin badge. You can unpin it the same way anytime.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            Where is my data stored? Is it private?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            All your data is stored entirely on your device using browser localStorage. Nothing is sent to any server — your progress, history, and notifications are fully private and only accessible on your own device.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            What happens when I delete a progress?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Deleted progress is moved to your History log with a "Deleted" tag and the date it was removed. You can view your full deletion history through the History panel in the sidebar. The history can be cleared separately from the History popup.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            How do Achievements and XP work?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Achievements are milestones you unlock by reaching goals — like completing your first tracker, hitting a 7-day streak, or finishing 100 productive days. Each achievement rewards XP which increases your level shown in the Achievements popup.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            What do the different progress statuses mean?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Completed means 100% of days are marked done. In Progress means it's currently active within its date range. Expired means the end date has passed without completion. Not Started means the start date hasn't arrived yet.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            Can I use Progress Tracker on multiple devices?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Currently, data is stored locally on each device. Cross-device sync with cloud backup is planned for a future update. For now, your progress on one device won't automatically appear on another device.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            Why are my notifications not showing?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Notifications in Progress Tracker are in-app alerts — they appear in the bell icon popup in the navbar. You'll get alerts when a progress starts today, when you're 3 days from a deadline, or when you complete a goal at 100%. Make sure you visit the app on that day to trigger them.
+          </div>
+        </div>
+
+        <div class="faq-box">
+          <button class="faq-question">
+            Is login required to use the app?
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            The app currently uses a basic login check to protect your home screen. Full authentication with account creation and cloud profiles is planned for a future update.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- REPORT -->
+      <section class="report-box">
+        <div>
+          <h2>Still facing an issue?</h2>
+          <p>Let us know and we'll help you as soon as possible.</p>
+        </div>
+        <button class="report-btn" onclick="window.location.href='feedback.html'">
+          <i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Report an Issue
+        </button>
+      </section>
+
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-top">
+        <a href="/support" class="footer-link"><i class="fa-regular fa-envelope"></i> Support</a>
+        <a href="/feedback" class="footer-link"><i class="fa-regular fa-comment-dots"></i> Feedback</a>
+        <a href="/termsandconditions" class="footer-link"><i class="fa-solid fa-file-lines"></i> Terms &amp; Conditions</a>
+      </div>
+      <div class="footer-copy">© Progress Tracker 2026 — All Rights Reserved</div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ── FAQ ACCORDION (one open at a time) ── */
+    const faqBoxes = document.querySelectorAll(".faq-box");
+    faqBoxes.forEach(box => {
+      box.querySelector(".faq-question").addEventListener("click", () => {
+        const isActive = box.classList.contains("active");
+        faqBoxes.forEach(b => b.classList.remove("active"));
+        if (!isActive) box.classList.add("active");
+      });
+    });
+  </script>
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+</body>
+</html>

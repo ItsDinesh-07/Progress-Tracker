@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Progress Tracker</title>
+<link rel="icon" type="png" href="main icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#050505;color:white;overflow-x:hidden;}
+
+/* ── DEMO BANNER ── */
+.demo-banner{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  height:44px;
+  background:linear-gradient(90deg,rgba(0,255,136,.12),rgba(0,212,170,.08),rgba(0,255,136,.12));
+  border-bottom:1px solid rgba(0,255,136,.2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px;
+  backdrop-filter:blur(12px);
+}
+.demo-banner-left{display:flex;align-items:center;gap:10px;font-size:13px;color:#00ff88;font-weight:600;}
+.demo-banner-left i{font-size:14px;}
+.demo-banner-left span{color:#64748b;font-weight:400;}
+.demo-banner-right{display:flex;align-items:center;gap:12px;}
+.demo-signup-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 18px;border-radius:10px;
+  background:linear-gradient(135deg,#00ff88,#00d4aa);
+  color:#000;font-size:12px;font-weight:700;
+  border:none;cursor:pointer;transition:.3s;
+  box-shadow:0 0 16px rgba(0,255,136,.3);
+  font-family:'Poppins',sans-serif;
+}
+.demo-signup-btn:hover{transform:translateY(-1px);box-shadow:0 0 24px rgba(0,255,136,.45);}
+.demo-back-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  color:#94a3b8;font-size:12px;font-weight:500;cursor:pointer;transition:.25s;
+  font-family:'Poppins',sans-serif;
+}
+.demo-back-btn:hover{border-color:rgba(255,255,255,.2);color:white;}
+
+/* ── NAVBAR ── */
+.navbar{
+  width:100%;height:70px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 50px;
+  background:rgba(5,5,5,0.75);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(18px);
+  position:fixed;top:44px;z-index:1000;
+  pointer-events:none;
+}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.nav-logo-text{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:white;}
+.nav-logo-text span{color:#00ff88;}
+.nav-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#00ff88,#00d4aa);display:flex;align-items:center;justify-content:center;color:#000;font-size:16px;box-shadow:0 0 16px rgba(0,255,136,.3);}
+.nav-search-fake{width:220px;height:40px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);cursor:not-allowed;opacity:.6;}
+.nav-search-fake i{color:#64748b;font-size:13px;}
+.nav-search-fake span{color:#334155;font-size:13px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-btn-fake{display:flex;align-items:center;gap:8px;padding:0 18px;height:38px;border-radius:11px;font-size:13px;font-weight:600;cursor:not-allowed;opacity:.7;}
+.nav-btn-green{background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;border:none;box-shadow:0 0 16px rgba(0,255,136,.2);}
+.nav-btn-outline{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;}
+.nav-icon-fake{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,.08);color:#64748b;font-size:15px;cursor:not-allowed;opacity:.6;}
+
+/* ── TABS ── */
+.demo-tabs{
+  position:fixed;top:114px;left:0;right:0;z-index:990;
+  background:rgba(5,5,5,.92);border-bottom:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(16px);
+  display:flex;align-items:center;gap:0;padding:0 30px;height:52px;
+}
+.demo-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:0 22px;height:100%;
+  font-size:13px;font-weight:500;color:#64748b;
+  cursor:pointer;border-bottom:2px solid transparent;transition:.2s;
+  position:relative;
+}
+.demo-tab.active{color:#00ff88;border-bottom-color:#00ff88;}
+.demo-tab:hover:not(.demo-tab-locked){color:#e2e8f0;}
+.demo-tab-locked{cursor:not-allowed;}
+.demo-tab-locked:hover{color:#64748b;}
+.lock-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:20px;
+  background:rgba(255,255,255,.06);
+  color:#475569;font-size:10px;font-weight:600;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* ── LOCKED OVERLAY ── */
+.locked-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  z-index:8888;display:none;align-items:center;justify-content:center;
+}
+.locked-overlay.show{display:flex;}
+.locked-modal{
+  width:100%;max-width:460px;
+  background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));
+  border:1px solid rgba(0,255,136,.15);border-radius:26px;padding:40px;
+  text-align:center;
+  animation:popIn .35s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 0 60px rgba(0,255,136,.08),0 20px 60px rgba(0,0,0,.8);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.locked-icon{
+  width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(145deg,rgba(0,255,136,.12),rgba(0,255,136,.04));
+  border:1px solid rgba(0,255,136,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;color:#00ff88;margin:0 auto 22px;
+  box-shadow:0 0 30px rgba(0,255,136,.15);
+}
+.locked-title{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px;}
+.locked-title span{color:#00ff88;}
+.locked-desc{font-size:15px;color:#64748b;line-height:1.7;margin-bottom:28px;max-width:340px;margin-left:auto;margin-right:auto;}
+.locked-features{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:left;}
+.locked-feature{display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);}
+.locked-feature i{color:#00ff88;font-size:13px;width:16px;text-align:center;}
+.locked-cta{
+  width:100%;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,#00ff88,#00d4aa);
+  color:#000;font-size:15px;font-weight:700;border:none;cursor:pointer;
+  transition:.3s;box-shadow:0 0 24px rgba(0,255,136,.3);
+  font-family:'Poppins',sans-serif;margin-bottom:12px;
+  position:relative;overflow:hidden;
+}
+.locked-cta::before{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:.5s;}
+.locked-cta:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(0,255,136,.45);}
+.locked-cta:hover::before{left:100%;}
+.locked-close{font-size:13px;color:#475569;cursor:pointer;transition:.2s;}
+.locked-close:hover{color:#e2e8f0;}
+
+/* ── MAIN CONTENT ── */
+.main{max-width:1280px;margin:auto;padding:182px 30px 60px;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes cardPop{from{opacity:0;transform:translateY(20px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:30px 0 28px;animation:fadeUp .8s ease forwards;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);color:#00ff88;font-size:12px;font-weight:600;letter-spacing:1px;margin-bottom:18px;}
+.hero h1{font-size:48px;line-height:1.15;max-width:760px;margin:0 auto 14px;font-weight:700;letter-spacing:-2px;}
+.hero h1 span{color:#00ff88;}
+.hero p{color:#64748b;font-size:16px;line-height:1.7;margin-bottom:24px;}
+.hero-btns{display:flex;gap:12px;justify-content:center;align-items:center;}
+.hero-btn-primary{display:flex;align-items:center;gap:8px;padding:13px 28px;border-radius:14px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.3s;box-shadow:0 0 24px rgba(0,255,136,.28);font-family:'Poppins',sans-serif;}
+.hero-btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(0,255,136,.45);}
+.hero-btn-secondary{display:flex;align-items:center;gap:8px;padding:13px 24px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:white;font-size:14px;font-weight:500;cursor:pointer;transition:.3s;}
+.hero-btn-secondary:hover{border-color:rgba(0,255,136,.3);color:#00ff88;}
+
+/* ── STAT CARDS ── */
+.stat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;animation:cardPop .7s .1s ease both;}
+.stat-card{padding:22px;border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;transition:.3s;}
+.stat-card::after{content:"";position:absolute;width:100px;height:100px;top:-40px;right:-40px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);pointer-events:none;}
+.stat-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.1);box-shadow:0 0 30px var(--glow);}
+.stat-card.blue{--glow:rgba(59,130,246,.1);}.stat-card.blue .st-icon{background:rgba(59,130,246,.12);color:#3b82f6;}.stat-card.blue .st-num{color:#3b82f6;}
+.stat-card.green{--glow:rgba(0,255,136,.08);}.stat-card.green .st-icon{background:rgba(0,255,136,.1);color:#00ff88;}.stat-card.green .st-num{color:#00ff88;text-shadow:0 0 16px rgba(0,255,136,.4);}
+.stat-card.purple{--glow:rgba(168,85,247,.08);}.stat-card.purple .st-icon{background:rgba(168,85,247,.12);color:#a855f7;}.stat-card.purple .st-num{color:#a855f7;}
+.st-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:16px;}
+.st-num{font-size:40px;font-weight:700;line-height:1;margin-bottom:5px;}
+.st-label{font-size:13px;color:#64748b;}
+.st-sub{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.stat-card.blue .st-sub{background:rgba(59,130,246,.12);color:#3b82f6;}
+.stat-card.green .st-sub{background:rgba(0,255,136,.1);color:#00ff88;}
+.stat-card.purple .st-sub{background:rgba(168,85,247,.12);color:#a855f7;}
+
+/* ── MID ROW ── */
+.mid-row{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:24px;animation:cardPop .7s .2s ease both;}
+.section-card{padding:22px;border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:15px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px;}
+.section-sub{font-size:12px;color:#475569;}
+.activity-item{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);margin-bottom:8px;transition:.2s;}
+.activity-item:last-child{margin-bottom:0;}
+.act-icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.act-name{font-size:13px;font-weight:500;color:#e2e8f0;margin-bottom:2px;}
+.act-date{font-size:11px;color:#475569;}
+.act-pct{font-size:13px;font-weight:700;margin-left:auto;flex-shrink:0;}
+.ins-item{padding:12px 14px;border-radius:13px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);margin-bottom:9px;transition:.2s;}
+.ins-item:last-child{margin-bottom:0;}
+.ins-label{font-size:11px;color:#475569;margin-bottom:4px;}
+.ins-val{font-size:20px;font-weight:700;color:#00ff88;}
+.ins-val.amber{color:#facc15;}
+.view-analytics-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;border-radius:11px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00ff88;font-size:12px;font-weight:600;cursor:pointer;transition:.25s;margin-top:10px;}
+.view-analytics-btn:hover{background:rgba(0,255,136,.14);}
+
+/* ── PROGRESS LIST ── */
+.progress-section{animation:cardPop .7s .3s ease both;}
+.progress-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.progress-section-title{font-size:17px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px;}
+.progress-card{display:flex;align-items:center;gap:14px;padding:16px 20px;margin-bottom:10px;border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,0.02),rgba(255,255,255,0.008));border:1px solid rgba(255,255,255,.06);transition:.25s;}
+.progress-card:hover{border-color:rgba(255,255,255,.1);transform:translateY(-2px);}
+.progress-icon-wrap{width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.progress-info{min-width:180px;flex-shrink:0;}
+.progress-info h4{font-size:14px;font-weight:600;margin-bottom:3px;color:#e2e8f0;}
+.progress-info span{font-size:11px;color:#475569;}
+.progress-bar-wrap{flex:1;display:flex;align-items:center;gap:10px;}
+.p-bar{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden;}
+.p-fill{height:100%;border-radius:20px;}
+.p-pct{font-size:13px;font-weight:700;min-width:34px;text-align:right;}
+.p-status{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;flex-shrink:0;min-width:86px;text-align:center;}
+.p-open-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:9px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#3b82f6;font-size:12px;font-weight:600;cursor:pointer;transition:.25s;flex-shrink:0;}
+.p-open-btn:hover{background:rgba(59,130,246,.18);}
+
+/* ── ACHIEVEMENT BAR ── */
+.ach-bar-section{margin:20px 0 0;animation:cardPop .7s .35s ease both;}
+.ach-bar-card{padding:16px 22px;border-radius:18px;background:linear-gradient(145deg,rgba(250,204,21,0.05),rgba(255,255,255,0.01));border:1px solid rgba(250,204,21,.15);display:flex;align-items:center;gap:18px;position:relative;overflow:hidden;}
+.ach-bar-card::before{content:'';position:absolute;width:130px;height:130px;top:-50px;right:-30px;border-radius:50%;background:radial-gradient(circle,rgba(250,204,21,.1),transparent 70%);pointer-events:none;}
+.ach-bar-icon{width:44px;height:44px;border-radius:13px;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);display:flex;align-items:center;justify-content:center;font-size:20px;color:#facc15;flex-shrink:0;}
+.ach-bar-info{flex:1;min-width:0;}
+.ach-bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.ach-bar-label{font-size:13px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:7px;}
+.ach-bar-level{font-size:11px;font-weight:700;color:#facc15;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);padding:2px 9px;border-radius:20px;}
+.ach-bar-xp{font-size:12px;color:#64748b;}
+.ach-bar-track{height:7px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden;}
+.ach-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#facc15,#f97316);box-shadow:0 0 8px rgba(250,204,21,.3);}
+.ach-bar-badges{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.ach-badge-mini{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.25);color:#facc15;}
+.ach-badge-mini.locked{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#334155;}
+
+/* ── MOTIVATION BOX ── */
+.motivation-wrap{margin-top:20px;margin-bottom:40px;animation:cardPop .7s .4s ease both;}
+.motivation-box{position:relative;overflow:hidden;border-radius:24px;padding:22px;background:linear-gradient(145deg,#050505,#080808);border:1px solid rgba(255,170,0,.22);display:flex;align-items:center;justify-content:space-between;box-shadow:0 0 40px rgba(255,140,0,.05);}
+.motivation-bg{position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(255,140,0,.15),transparent 30%),radial-gradient(circle at bottom left,rgba(255,140,0,.08),transparent 25%);pointer-events:none;}
+.motivation-animated-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.motivation-animated-bg span{position:absolute;border-radius:50%;background:#ffb300;box-shadow:0 0 8px #ffb300;animation:floatDots linear infinite;}
+.motivation-animated-bg span:nth-child(1){width:5px;height:5px;left:8%;top:70%;animation-duration:7s;}
+.motivation-animated-bg span:nth-child(2){width:3px;height:3px;left:26%;top:35%;animation-duration:9s;}
+.motivation-animated-bg span:nth-child(3){width:5px;height:5px;left:54%;top:72%;animation-duration:11s;}
+.motivation-animated-bg span:nth-child(4){width:4px;height:4px;left:74%;top:25%;animation-duration:8s;}
+.motivation-animated-bg span:nth-child(5){width:3px;height:3px;left:90%;top:65%;animation-duration:10s;}
+@keyframes floatDots{0%{transform:translateY(0) scale(1);opacity:0;}20%{opacity:.8;}50%{transform:translateY(-22px) scale(1.3);}100%{transform:translateY(-50px) scale(.7);opacity:0;}}
+.quote-arrow-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,170,0,.2);background:rgba(255,170,0,.05);color:#ffb300;font-size:16px;cursor:pointer;transition:.3s;flex-shrink:0;z-index:2;}
+.quote-arrow-btn:hover{background:rgba(255,170,0,.1);}
+.motivation-center{flex:1;z-index:2;text-align:center;padding:0 20px;}
+.quote-tag-txt{font-size:11px;letter-spacing:3px;color:#ffb300;font-weight:600;margin-bottom:16px;}
+.quote-text-box{font-size:17px;line-height:1.4;color:white;font-weight:300;max-width:580px;margin:auto;transition:opacity .5s,transform .5s;}
+.quote-text-box span{color:#ffb300;font-weight:400;}
+.quote-dots{display:flex;justify-content:center;gap:8px;margin-top:14px;}
+.quote-dot{width:7px;height:7px;border-radius:20px;background:#343434;transition:.35s;cursor:pointer;}
+.quote-dot.active{width:18px;background:#ffb300;}
+
+/* ── ANALYTICS TAB ── */
+.analytics-page{display:none;}
+.analytics-page.active-tab{display:block;}
+.dashboard-page{display:block;}
+.dashboard-page.hidden{display:none;}
+
+/* Page header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;animation:fadeUp .7s ease forwards;}
+.page-header-left h1{font-size:30px;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:12px;}
+.page-header-left h1 i{color:#00ff88;font-size:26px;}
+.page-header-left p{color:#64748b;font-size:14px;margin-top:5px;}
+.filter-row{display:flex;gap:8px;}
+.filter-btn{padding:8px 16px;border-radius:11px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,.08);background:#0a0a0a;color:#94a3b8;cursor:pointer;transition:.2s;}
+.filter-btn.active{background:rgba(0,255,136,.08);color:#00ff88;border-color:rgba(0,255,136,.25);}
+
+/* Overview cards */
+.overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;animation:cardPop .6s .1s ease both;}
+.ov-card{padding:20px;border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);transition:.3s;position:relative;overflow:hidden;}
+.ov-card::after{content:"";position:absolute;width:100px;height:100px;top:-40px;right:-40px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);pointer-events:none;}
+.ov-card:hover{transform:translateY(-4px);box-shadow:0 0 30px var(--glow);}
+.ov-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;}
+.ov-num{font-size:38px;font-weight:700;line-height:1;margin-bottom:5px;}
+.ov-label{font-size:12px;color:#64748b;}
+.ov-badge{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.ov-card.blue{--glow:rgba(59,130,246,0.08);}.ov-card.blue .ov-icon{background:rgba(59,130,246,.12);color:#3b82f6;}.ov-card.blue .ov-num{color:#3b82f6;}.ov-card.blue .ov-badge{background:rgba(59,130,246,.12);color:#3b82f6;}
+.ov-card.green{--glow:rgba(0,255,136,0.08);}.ov-card.green .ov-icon{background:rgba(0,255,136,.10);color:#00ff88;}.ov-card.green .ov-num{color:#00ff88;text-shadow:0 0 16px rgba(0,255,136,.4);}.ov-card.green .ov-badge{background:rgba(0,255,136,.10);color:#00ff88;}
+.ov-card.purple{--glow:rgba(168,85,247,0.08);}.ov-card.purple .ov-icon{background:rgba(168,85,247,.12);color:#a855f7;}.ov-card.purple .ov-num{color:#a855f7;}.ov-card.purple .ov-badge{background:rgba(168,85,247,.12);color:#a855f7;}
+.ov-card.amber{--glow:rgba(250,204,21,0.08);}.ov-card.amber .ov-icon{background:rgba(250,204,21,.10);color:#facc15;}.ov-card.amber .ov-num{color:#facc15;text-shadow:0 0 16px rgba(250,204,21,.4);}.ov-card.amber .ov-badge{background:rgba(250,204,21,.10);color:#facc15;}
+
+/* Charts row */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px;animation:cardPop .6s .2s ease both;}
+.chart-card{background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:22px;}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.chart-title{font-size:14px;font-weight:600;color:#e2e8f0;}
+.chart-sub{font-size:11px;color:#475569;margin-top:2px;}
+.tab-pills{display:flex;gap:5px;}
+.tab-pill{padding:4px 10px;border-radius:7px;font-size:11px;cursor:pointer;transition:.2s;color:#64748b;border:1px solid transparent;}
+.tab-pill.active{background:#111;color:#fff;border-color:rgba(255,255,255,.1);}
+.bar-area{height:200px;position:relative;}
+.donut-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.donut-area canvas{width:130px!important;height:130px!important;}
+.legend-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;width:100%;}
+.legend-row:last-child{border-bottom:none;}
+.legend-left{display:flex;align-items:center;gap:8px;color:#94a3b8;}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-val{font-weight:600;font-size:13px;}
+
+/* Mid row analytics */
+.mid-row-analytics{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;animation:cardPop .6s .3s ease both;}
+.hm-row{display:flex;gap:4px;}
+.hm-cell{width:20px;height:20px;border-radius:3px;}
+.hm-0{background:#0f172a;}.hm-1{background:#14532d;}.hm-2{background:#166534;}.hm-3{background:#16a34a;}.hm-4{background:#22c55e;}.hm-5{background:#4ade80;}
+.hm-weeks{display:flex;flex-direction:column;gap:4px;}
+.gp-item{padding:11px 13px;border-radius:13px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:10px;margin-bottom:8px;transition:.2s;}
+.gp-item:last-child{margin-bottom:0;}
+.gp-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.gp-info{flex:1;min-width:0;}
+.gp-name{font-size:12px;font-weight:500;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gp-meta{font-size:10px;color:#475569;margin-top:2px;}
+.gp-right{width:90px;flex-shrink:0;}
+.gp-bar-bg{height:4px;background:#111;border-radius:3px;overflow:hidden;}
+.gp-bar-fill{height:100%;border-radius:3px;}
+.gp-pct{font-size:10px;color:#64748b;text-align:right;margin-top:3px;}
+
+/* Bottom row analytics */
+.bottom-row-analytics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;animation:cardPop .6s .4s ease both;}
+.streak-circle-wrap{position:relative;width:120px;height:120px;margin:auto;}
+.streak-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.streak-num h2{font-size:34px;color:#facc15;font-weight:700;line-height:1;}
+.streak-num p{font-size:12px;color:#94a3b8;}
+.streak-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+.streak-mini{padding:11px;border-radius:11px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);text-align:center;}
+.streak-mini p{font-size:10px;color:#475569;margin-bottom:4px;}
+.streak-mini h3{font-size:18px;font-weight:600;}
+.insight-list{display:flex;flex-direction:column;gap:8px;}
+.insight-item{padding:12px;border-radius:13px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-start;gap:10px;}
+.insight-emoji{font-size:20px;flex-shrink:0;margin-top:1px;}
+.insight-head{font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:2px;}
+.insight-body{font-size:11px;color:#475569;line-height:1.5;}
+.meter-section{display:flex;flex-direction:column;gap:12px;}
+.meter-card{padding:14px;border-radius:13px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);}
+.meter-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:8px;}
+.meter-label span:last-child{font-weight:600;color:white;}
+.meter-bg{height:7px;background:#0f172a;border-radius:20px;overflow:hidden;}
+.meter-fill{height:100%;border-radius:20px;}
+.radial-center{display:flex;justify-content:center;margin-bottom:10px;}
+.radial-el{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.radial-inner{width:70px;height:70px;border-radius:50%;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.radial-inner h2{font-size:16px;color:#00ff88;font-weight:700;margin:0;}
+.radial-inner p{font-size:9px;color:#475569;}
+
+/* Table */
+.table-card{background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:22px;margin-bottom:20px;animation:cardPop .6s .5s ease both;}
+.ptable{width:100%;border-collapse:collapse;}
+.ptable th{text-align:left;padding:9px 14px;font-size:10px;font-weight:600;color:#334155;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid rgba(255,255,255,.05);}
+.ptable td{padding:13px 14px;font-size:12px;color:#cbd5e1;border-bottom:1px solid rgba(255,255,255,.03);}
+.ptable tr:last-child td{border-bottom:none;}
+.ptable tr:hover td{background:rgba(255,255,255,.02);}
+.prog-name{font-weight:500;color:#e2e8f0;}
+.status-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.chip-complete{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);}
+.chip-progress{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);}
+.chip-notstarted{background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2);}
+.inline-bar{width:100px;height:4px;background:#111;border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px;}
+.inline-fill{height:100%;border-radius:3px;}
+
+/* ── SAVED TAB PAGE (inside demo - just shows "locked" state) ── */
+.saved-page{display:none;}
+.saved-page.active-tab{display:block;}
+
+/* ── ANALYTICS VIOLET MOTIVATION ── */
+.analytics-motivation{position:relative;overflow:hidden;border-radius:22px;padding:20px;background:linear-gradient(145deg,#050505,#080808);border:1px solid rgba(168,85,247,.22);display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:30px;animation:cardPop .6s .55s ease both;}
+.analytics-motivation-bg{position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(168,85,247,.15),transparent 30%),radial-gradient(circle at bottom left,rgba(139,92,246,.08),transparent 25%);pointer-events:none;}
+.analytics-motivation-animated-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.analytics-motivation-animated-bg span{position:absolute;border-radius:50%;background:#a855f7;box-shadow:0 0 8px #a855f7;animation:floatDots linear infinite;}
+.analytics-motivation-animated-bg span:nth-child(1){width:5px;height:5px;left:8%;top:70%;animation-duration:7s;}
+.analytics-motivation-animated-bg span:nth-child(2){width:3px;height:3px;left:26%;top:35%;animation-duration:9s;}
+.analytics-motivation-animated-bg span:nth-child(3){width:5px;height:5px;left:54%;top:72%;animation-duration:11s;}
+.analytics-motivation-animated-bg span:nth-child(4){width:4px;height:4px;left:74%;top:25%;animation-duration:8s;}
+.analytics-motivation-animated-bg span:nth-child(5){width:3px;height:3px;left:90%;top:65%;animation-duration:10s;}
+.a-quote-arrow{width:40px;height:40px;border-radius:50%;border:1px solid rgba(168,85,247,.2);background:rgba(168,85,247,.05);color:#a855f7;font-size:14px;cursor:pointer;transition:.3s;flex-shrink:0;z-index:2;}
+.a-quote-arrow:hover{background:rgba(168,85,247,.1);}
+.a-motivation-center{flex:1;z-index:2;text-align:center;padding:0 18px;}
+.a-quote-tag{font-size:11px;letter-spacing:3px;color:#a855f7;font-weight:600;margin-bottom:12px;}
+.a-quote-text{font-size:16px;line-height:1.4;color:white;font-weight:300;max-width:560px;margin:auto;}
+.a-quote-text span{color:#a855f7;font-weight:400;}
+.a-quote-dots{display:flex;justify-content:center;gap:7px;margin-top:12px;}
+.a-quote-dot{width:6px;height:6px;border-radius:20px;background:#343434;transition:.35s;cursor:pointer;}
+.a-quote-dot.active{width:16px;background:#a855f7;}
+
+/* ── FOOTER ── */
+.footer{margin-top:20px;padding:22px 0 14px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+.footer-top{display:flex;align-items:center;justify-content:center;gap:26px;margin-bottom:12px;flex-wrap:wrap;}
+.footer-link{color:#334155;font-size:12px;display:flex;align-items:center;gap:5px;}
+.footer-copy{font-size:12px;color:#1e293b;}
+
+
+</style>
+</head>
+<body>
+
+<!-- ── DEMO BANNER ── -->
+<div class="demo-banner">
+  <div class="demo-banner-left">
+    <i class="fa-solid fa-eye"></i>
+    <strong>Demo Mode</strong>
+  
+  </div>
+  <div class="demo-banner-right">
+    <button class="demo-back-btn" onclick="window.location.href='index.html'">
+      <i class="fa-solid fa-arrow-left"></i> Back to Landing
+    </button>
+    <button class="demo-signup-btn" onclick="window.location.href='login.html?tab=signup'">
+      <i class="fa-solid fa-rocket"></i> Sign Up Free
+    </button>
+  </div>
+</div>
+
+<!-- ── NAVBAR (fake, non-interactive) ── -->
+<div class="navbar">
+  <div class="nav-left">
+    <div class="nav-logo-icon"><i class="fa-solid fa-chart-line"></i></div>
+    <span class="nav-logo-text">Progress<span>Tracker</span></span>
+    <div class="nav-search-fake">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>Search progress...</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-btn-fake nav-btn-green"><i class="fa-solid fa-plus" style="font-size:12px;"></i> New Progress</div>
+    <div class="nav-btn-fake nav-btn-outline"><i class="fa-solid fa-chart-line" style="font-size:12px;"></i> Analytics</div>
+    <div class="nav-icon-fake"><i class="fa-regular fa-floppy-disk"></i></div>
+    <div class="nav-icon-fake"><i class="fa-regular fa-bell"></i></div>
+    <div class="nav-icon-fake"><i class="fa-solid fa-user" style="font-size:14px;"></i></div>
+  </div>
+</div>
+
+<!-- ── DEMO TABS ── -->
+<div class="demo-tabs">
+  <div class="demo-tab active" onclick="switchTab('dashboard')">
+    <i class="fa-solid fa-house" style="font-size:13px;"></i> Dashboard
+  </div>
+  <div class="demo-tab active" onclick="switchTab('analytics')" id="tab-analytics">
+    <i class="fa-solid fa-chart-line" style="font-size:13px;"></i> Analytics
+  </div>
+  <div class="demo-tab active" onclick="switchTab('saved')" id="tab-saved">
+    <i class="fa-solid fa-bookmark" style="font-size:13px;"></i> Saved
+  </div>
+  <div class="demo-tab demo-tab-locked" onclick="showLocked('tracker')">
+    <i class="fa-solid fa-bullseye" style="font-size:13px;"></i> Tracker
+    <span class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i> </span>
+  </div>
+  <div class="demo-tab demo-tab-locked" onclick="showLocked('create')">
+    <i class="fa-solid fa-plus" style="font-size:13px;"></i> Create Progress
+    <span class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i></span>
+  </div>
+  <div class="demo-tab demo-tab-locked" onclick="showLocked('achievements')">
+    <i class="fa-solid fa-trophy" style="font-size:13px;"></i> Achievements
+    <span class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i></span>
+  </div>
+  <div class="demo-tab demo-tab-locked" onclick="showLocked('calendar')">
+    <i class="fa-solid fa-calendar-days" style="font-size:13px;"></i> Calendar
+    <span class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i></span>
+  </div>
+  <div class="demo-tab demo-tab-locked" onclick="showLocked('notifications')">
+    <i class="fa-regular fa-bell" style="font-size:13px;"></i> Notifications
+    <span class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i></span>
+  </div>
+</div>
+
+<!-- ── LOCKED MODAL ── -->
+<div class="locked-overlay" id="lockedOverlay">
+  <div class="locked-modal">
+    <div class="locked-icon"><i class="fa-solid fa-lock"></i></div>
+    <div class="locked-title">Unlock <span id="lockedFeatureName">This Feature</span></div>
+    <div class="locked-desc">This feature is available in the full version. Sign up for free to access everything — For Free!</div>
+    <div class="locked-features">
+      <div class="locked-feature"><i class="fa-solid fa-check"></i> Daily Progress Tracker for any goal</div>
+      <div class="locked-feature"><i class="fa-solid fa-check"></i> Full Analytics with charts & heatmaps</div>
+      <div class="locked-feature"><i class="fa-solid fa-check"></i> Achievement System with XP & levels</div>
+      <div class="locked-feature"><i class="fa-solid fa-check"></i> Smart Notifications & streak alerts</div>
+      <div class="locked-feature"><i class="fa-solid fa-check"></i> Calendar, History & much more</div>
+    </div>
+    <button class="locked-cta" onclick="window.location.href='login.html'">
+      <i class="fa-solid fa-rocket" style="margin-right:8px;"></i> Create Free Account — It's Free!
+    </button>
+    <div class="locked-close" onclick="closeLocked()">Continue viewing demo</div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+<!-- ═══════════════ DASHBOARD PAGE ═══════════════ -->
+<div class="dashboard-page" id="dashboardPage">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag"><i class="fa-solid fa-eye"></i> DEMO PREVIEW</div>
+    <h1>Track your goals — build <span>consistency</span> daily.</h1>
+    <p>This is a live demo with sample data. Sign up to start tracking your real goals!</p>
+    <div class="hero-btns">
+      <button class="hero-btn-primary" onclick="window.location.href='login.html?tab=signup'">
+        <i class="fa-solid fa-rocket"></i> Start Free — Sign Up
+      </button>
+      <button class="hero-btn-secondary" onclick="switchTab('analytics')">
+        <i class="fa-solid fa-chart-line"></i> View Analytics Demo
+      </button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-cards">
+    <div class="stat-card blue">
+      <div class="st-icon"><i class="fa-solid fa-chart-line"></i></div>
+      <div class="st-num">7</div>
+      <div class="st-label">Total Progress</div>
+      <div class="st-sub"><i class="fa-solid fa-arrow-right" style="font-size:9px;"></i> View All</div>
+    </div>
+    <div class="stat-card green">
+      <div class="st-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="st-num">2</div>
+      <div class="st-label">Completed Goals</div>
+      <div class="st-sub"><i class="fa-solid fa-check" style="font-size:9px;"></i> 28% Success</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="st-icon"><i class="fa-solid fa-clock"></i></div>
+      <div class="st-num">4</div>
+      <div class="st-label">Active Progress</div>
+      <div class="st-sub"><i class="fa-solid fa-fire" style="font-size:9px;"></i> In Progress</div>
+    </div>
+  </div>
+
+  <!-- MID ROW -->
+  <div class="mid-row">
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title"><i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> Recent Activity</div>
+        <div class="section-sub">Last 5 opened</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fa-solid fa-code"></i></div>
+        <div><div class="act-name">Learn DSA — 100 Days</div><div class="act-date">Opened Jun 1, 2026</div></div>
+        <div class="act-pct" style="color:#3b82f6;">85%</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-dumbbell"></i></div>
+        <div><div class="act-name">Morning Workout Streak</div><div class="act-date">Opened May 31, 2026</div></div>
+        <div class="act-pct" style="color:#00ff88;">72%</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon" style="background:rgba(168,85,247,.12);color:#a855f7;"><i class="fa-solid fa-book"></i></div>
+        <div><div class="act-name">Read 12 Books This Year</div><div class="act-date">Opened May 30, 2026</div></div>
+        <div class="act-pct" style="color:#a855f7;">58%</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-paintbrush"></i></div>
+        <div><div class="act-name">Daily Sketching Habit</div><div class="act-date">Opened May 29, 2026</div></div>
+        <div class="act-pct" style="color:#facc15;">40%</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon" style="background:rgba(239,68,68,.1);color:#ef4444;"><i class="fa-solid fa-language"></i></div>
+        <div><div class="act-name">Spanish — 30 Min/Day</div><div class="act-date">Opened May 28, 2026</div></div>
+        <div class="act-pct" style="color:#ef4444;">33%</div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title"><i class="fa-solid fa-lightbulb" style="color:#facc15;"></i> Quick Insights</div>
+      </div>
+      <div class="ins-item"><div class="ins-label">🏆 Best Streak</div><div class="ins-val amber">14 days</div></div>
+      <div class="ins-item"><div class="ins-label">📊 Overall Completion Rate</div><div class="ins-val">67%</div></div>
+      <div class="ins-item"><div class="ins-label">🔥 Current Active Goals</div><div class="ins-val">4</div></div>
+      <div class="view-analytics-btn" onclick="switchTab('analytics')">
+        <i class="fa-solid fa-chart-line"></i> View Analytics
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS LIST -->
+  <div class="progress-section">
+    <div class="progress-section-head">
+      <div class="progress-section-title"><i class="fa-solid fa-list-check" style="color:#00ff88;font-size:16px;"></i> Your Progress</div>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fa-solid fa-code"></i></div>
+      <div class="progress-info"><h4>Learn DSA — 100 Days</h4><span>2026-01-01 → 2026-04-10</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:85%;background:#3b82f6;box-shadow:0 0 8px #3b82f6;"></div></div>
+        <div class="p-pct" style="color:#3b82f6;">85%</div>
+      </div>
+      <div class="p-status" style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);">Completed</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-dumbbell"></i></div>
+      <div class="progress-info"><h4>Morning Workout Streak</h4><span>2026-03-01 → 2026-08-31</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:72%;background:#facc15;box-shadow:0 0 8px #facc15;"></div></div>
+        <div class="p-pct" style="color:#facc15;">72%</div>
+      </div>
+      <div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(168,85,247,.12);color:#a855f7;"><i class="fa-solid fa-book"></i></div>
+      <div class="progress-info"><h4>Read 12 Books This Year</h4><span>2026-01-01 → 2026-12-31</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:58%;background:#a855f7;box-shadow:0 0 8px #a855f7;"></div></div>
+        <div class="p-pct" style="color:#a855f7;">58%</div>
+      </div>
+      <div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-paintbrush"></i></div>
+      <div class="progress-info"><h4>Daily Sketching Habit</h4><span>2026-04-01 → 2026-09-30</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:40%;background:#facc15;box-shadow:0 0 8px #facc15;"></div></div>
+        <div class="p-pct" style="color:#facc15;">40%</div>
+      </div>
+      <div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(239,68,68,.1);color:#ef4444;"><i class="fa-solid fa-language"></i></div>
+      <div class="progress-info"><h4>Spanish — 30 Min/Day</h4><span>2026-02-01 → 2026-07-31</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:33%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></div></div>
+        <div class="p-pct" style="color:#ef4444;">33%</div>
+      </div>
+      <div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-moon"></i></div>
+      <div class="progress-info"><h4>Sleep 8 Hours Daily</h4><span>2026-01-15 → 2026-03-15</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:100%;background:#22c55e;box-shadow:0 0 8px #22c55e;"></div></div>
+        <div class="p-pct" style="color:#22c55e;">100%</div>
+      </div>
+      <div class="p-status" style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);">Completed</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-icon-wrap" style="background:rgba(99,102,241,.12);color:#6366f1;"><i class="fa-solid fa-mobile-screen"></i></div>
+      <div class="progress-info"><h4>No Phone Before 10am</h4><span>2026-06-01 → 2026-08-31</span></div>
+      <div class="progress-bar-wrap">
+        <div class="p-bar"><div class="p-fill" style="width:0%;background:#6366f1;"></div></div>
+        <div class="p-pct" style="color:#6366f1;">0%</div>
+      </div>
+      <div class="p-status" style="background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2);">Not Started</div>
+      <button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENT BAR -->
+  <div class="ach-bar-section">
+    <div class="ach-bar-card">
+      <div class="ach-bar-icon"><i class="fa-solid fa-trophy"></i></div>
+      <div class="ach-bar-info">
+        <div class="ach-bar-top">
+          <div class="ach-bar-label">
+            <i class="fa-solid fa-bolt" style="color:#facc15;font-size:11px;"></i>
+            Achievements Progress
+            <span class="ach-bar-level">Level 3</span>
+          </div>
+          <div style="font-size:12px;color:#64748b;">1420 XP</div>
+        </div>
+        <div class="ach-bar-track"><div class="ach-bar-fill" style="width:84%;"></div></div>
+      </div>
+      <div class="ach-bar-badges">
+        <div class="ach-badge-mini" title="First Step ✓"><i class="fa-solid fa-shoe-prints" style="font-size:12px;"></i></div>
+        <div class="ach-badge-mini" title="7 Day Streak ✓"><i class="fa-solid fa-fire" style="font-size:12px;"></i></div>
+        <div class="ach-badge-mini" title="Goal Crusher ✓"><i class="fa-solid fa-trophy" style="font-size:12px;"></i></div>
+        <div class="ach-badge-mini locked" title="Consistency Master (Locked)"><i class="fa-solid fa-crown" style="font-size:12px;"></i></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.2);color:#facc15;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;" onclick="showLocked('achievements')">
+        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i> View All
+      </div>
+    </div>
+  </div>
+
+  <!-- MOTIVATION BOX -->
+  <div class="motivation-wrap">
+    <div class="motivation-box">
+      <div class="motivation-bg"></div>
+      <div class="motivation-animated-bg"><span></span><span></span><span></span><span></span><span></span></div>
+      <button class="quote-arrow-btn" onclick="prevQuote()"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="motivation-center">
+        <div class="quote-tag-txt"><i class="fa-solid fa-quote-left"></i> &nbsp; DAILY MOTIVATION &nbsp; <i class="fa-solid fa-quote-right"></i></div>
+        <div class="quote-text-box" id="dashQuoteText"></div>
+        <div class="quote-dots" id="dashQuoteDots"></div>
+      </div>
+      <button class="quote-arrow-btn" onclick="nextQuote()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+</div><!-- end dashboardPage -->
+
+<!-- ═══════════════ ANALYTICS PAGE ═══════════════ -->
+<div class="analytics-page" id="analyticsPage">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
+      <p>Your overall progress insights &amp; performance overview (Demo Data)</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn" onclick="setFilter(7,this)">7 Days</button>
+      <button class="filter-btn active" onclick="setFilter(30,this)">30 Days</button>
+      <button class="filter-btn" onclick="setFilter(90,this)">3 Months</button>
+      <button class="filter-btn" onclick="setFilter(0,this)">All Time</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW CARDS -->
+  <div class="overview-grid">
+    <div class="ov-card blue"><div class="ov-icon"><i class="fa-solid fa-chart-line"></i></div><div class="ov-num">7</div><div class="ov-label">Total Progress</div><div class="ov-badge"><i class="fa-solid fa-arrow-up" style="font-size:9px;"></i> 2 completed</div></div>
+    <div class="ov-card green"><div class="ov-icon"><i class="fa-solid fa-circle-check"></i></div><div class="ov-num">2</div><div class="ov-label">Completed Goals</div><div class="ov-badge"><i class="fa-solid fa-check" style="font-size:9px;"></i> 28% rate</div></div>
+    <div class="ov-card purple"><div class="ov-icon"><i class="fa-solid fa-clock"></i></div><div class="ov-num">4</div><div class="ov-label">Active Progress</div><div class="ov-badge"><i class="fa-solid fa-hourglass" style="font-size:9px;"></i> 1 not started</div></div>
+    <div class="ov-card amber"><div class="ov-icon"><i class="fa-solid fa-fire-flame-curved"></i></div><div class="ov-num">14</div><div class="ov-label">Best Streak</div><div class="ov-badge"><i class="fa-solid fa-trophy" style="font-size:9px;"></i> 14 days record</div></div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Completion Rate Over Time</div><div class="chart-sub">Daily completion % trend</div></div>
+        <div class="tab-pills">
+          <div class="tab-pill active" onclick="switchDemoChart('line',this)">Line</div>
+          <div class="tab-pill" onclick="switchDemoChart('bar',this)">Bar</div>
+        </div>
+      </div>
+      <div class="bar-area"><canvas id="demoMainChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title">Status Breakdown</div><div class="chart-sub">All progress goals</div></div></div>
+      <div class="donut-area">
+        <canvas id="demoDonutChart"></canvas>
+        <div style="width:100%;">
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#00ff88;"></div>Completed</div><div class="legend-val">2 <span style="font-size:10px;color:#334155;">(28%)</span></div></div>
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#a855f7;"></div>Active</div><div class="legend-val">4 <span style="font-size:10px;color:#334155;">(57%)</span></div></div>
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#ef4444;"></div>Not Started</div><div class="legend-val">1 <span style="font-size:10px;color:#334155;">(14%)</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MID ROW -->
+  <div class="mid-row-analytics">
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title"><i class="fa-solid fa-fire" style="color:#facc15;margin-right:6px;"></i>Consistency Heatmap</div><div class="chart-sub">Last 10 weeks activity</div></div></div>
+      <div id="demoHeatmap"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title"><i class="fa-solid fa-bullseye" style="color:#3b82f6;margin-right:6px;"></i>Goal Progress</div><div class="chart-sub">Top active progress</div></div></div>
+      <div>
+        <div class="gp-item"><div class="gp-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fa-solid fa-code"></i></div><div class="gp-info"><div class="gp-name">Learn DSA — 100 Days</div><div class="gp-meta">85 of 100 days done</div></div><div class="gp-right"><div class="gp-bar-bg"><div class="gp-bar-fill" style="width:85%;background:#3b82f6;box-shadow:0 0 6px #3b82f6;"></div></div><div class="gp-pct">85%</div></div></div>
+        <div class="gp-item"><div class="gp-icon" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-dumbbell"></i></div><div class="gp-info"><div class="gp-name">Morning Workout Streak</div><div class="gp-meta">130 of 184 days done</div></div><div class="gp-right"><div class="gp-bar-bg"><div class="gp-bar-fill" style="width:72%;background:#00ff88;"></div></div><div class="gp-pct">72%</div></div></div>
+        <div class="gp-item"><div class="gp-icon" style="background:rgba(168,85,247,.12);color:#a855f7;"><i class="fa-solid fa-book"></i></div><div class="gp-info"><div class="gp-name">Read 12 Books This Year</div><div class="gp-meta">7 of 12 books</div></div><div class="gp-right"><div class="gp-bar-bg"><div class="gp-bar-fill" style="width:58%;background:#a855f7;"></div></div><div class="gp-pct">58%</div></div></div>
+        <div class="gp-item"><div class="gp-icon" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-paintbrush"></i></div><div class="gp-info"><div class="gp-name">Daily Sketching Habit</div><div class="gp-meta">73 of 183 days done</div></div><div class="gp-right"><div class="gp-bar-bg"><div class="gp-bar-fill" style="width:40%;background:#facc15;"></div></div><div class="gp-pct">40%</div></div></div>
+        <div class="gp-item"><div class="gp-icon" style="background:rgba(239,68,68,.1);color:#ef4444;"><i class="fa-solid fa-language"></i></div><div class="gp-info"><div class="gp-name">Spanish — 30 Min/Day</div><div class="gp-meta">60 of 181 days done</div></div><div class="gp-right"><div class="gp-bar-bg"><div class="gp-bar-fill" style="width:33%;background:#ef4444;"></div></div><div class="gp-pct">33%</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row-analytics">
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title"><i class="fa-solid fa-fire-flame-curved" style="color:#facc15;margin-right:6px;"></i>Streak</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;">
+        <div class="streak-circle-wrap">
+          <canvas id="demoStreakChart" width="120" height="120"></canvas>
+          <div class="streak-num"><h2>14</h2><p>Days</p></div>
+        </div>
+        <div class="streak-mini-grid">
+          <div class="streak-mini"><p>Best Streak</p><h3 style="color:#facc15;">14 <span style="font-size:11px;color:#64748b;">days</span></h3></div>
+          <div class="streak-mini"><p>Consistency</p><h3 style="color:#00ff88;">67%</h3></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title"><i class="fa-solid fa-lightbulb" style="color:#facc15;margin-right:6px;"></i>Insights</div></div>
+      <div class="insight-list">
+        <div class="insight-item"><div class="insight-emoji">🔥</div><div><div class="insight-head">14-Day Streak!</div><div class="insight-body">You're on fire! Keep the momentum going strong.</div></div></div>
+        <div class="insight-item"><div class="insight-emoji">📈</div><div><div class="insight-head">Good Progress</div><div class="insight-body">67% overall — you're improving. Aim for 75%+!</div></div></div>
+        <div class="insight-item"><div class="insight-emoji">✅</div><div><div class="insight-head">2 Goals Completed!</div><div class="insight-body">Great job finishing what you started. Keep it up!</div></div></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title"><i class="fa-solid fa-gauge" style="color:#00ff88;margin-right:6px;"></i>Consistency Meter</div></div>
+      <div class="meter-section">
+        <div class="radial-center">
+          <div class="radial-el" style="background:conic-gradient(#00ff88 241deg,rgba(255,255,255,.05) 0);display:flex;align-items:center;justify-content:center;">
+            <div class="radial-inner"><h2>67%</h2><p>Overall</p></div>
+          </div>
+        </div>
+        <div class="meter-card"><div class="meter-label"><span>Completion Rate</span><span>67%</span></div><div class="meter-bg"><div class="meter-fill" style="width:67%;background:#00ff88;box-shadow:0 0 8px #00ff88;"></div></div></div>
+        <div class="meter-card"><div class="meter-label"><span>Goals Finished</span><span>28%</span></div><div class="meter-bg"><div class="meter-fill" style="width:28%;background:#3b82f6;box-shadow:0 0 8px #3b82f6;"></div></div></div>
+        <div class="meter-card"><div class="meter-label"><span>Streak Health</span><span>100%</span></div><div class="meter-bg"><div class="meter-fill" style="width:100%;background:#facc15;box-shadow:0 0 8px #facc15;"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="chart-header" style="margin-bottom:14px;">
+      <div><div class="chart-title"><i class="fa-solid fa-table-list" style="color:#a855f7;margin-right:6px;"></i>All Progress Details</div><div class="chart-sub">Full overview of every progress goal (demo)</div></div>
+    </div>
+    <table class="ptable">
+      <thead><tr><th>#</th><th>Progress Name</th><th>Duration</th><th>Progress</th><th>Status</th><th>Done</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td style="color:#334155;">1</td><td><div class="prog-name">Learn DSA — 100 Days</div><div style="font-size:10px;color:#334155;">2026-01-01 → 2026-04-10</div></td><td>100 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:85%;background:#22c55e;"></div></div><span style="font-size:11px;font-weight:600;color:#22c55e;">85%</span></div></td><td><span class="status-chip chip-complete">Completed</span></td><td>85/100</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">2</td><td><div class="prog-name">Morning Workout Streak</div><div style="font-size:10px;color:#334155;">2026-03-01 → 2026-08-31</div></td><td>184 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:72%;background:#facc15;"></div></div><span style="font-size:11px;font-weight:600;color:#facc15;">72%</span></div></td><td><span class="status-chip chip-progress">In Progress</span></td><td>130/184</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">3</td><td><div class="prog-name">Read 12 Books This Year</div><div style="font-size:10px;color:#334155;">2026-01-01 → 2026-12-31</div></td><td>365 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:58%;background:#a855f7;"></div></div><span style="font-size:11px;font-weight:600;color:#a855f7;">58%</span></div></td><td><span class="status-chip chip-progress">In Progress</span></td><td>7/12</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">4</td><td><div class="prog-name">Daily Sketching Habit</div><div style="font-size:10px;color:#334155;">2026-04-01 → 2026-09-30</div></td><td>183 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:40%;background:#facc15;"></div></div><span style="font-size:11px;font-weight:600;color:#facc15;">40%</span></div></td><td><span class="status-chip chip-progress">In Progress</span></td><td>73/183</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">5</td><td><div class="prog-name">Spanish — 30 Min/Day</div><div style="font-size:10px;color:#334155;">2026-02-01 → 2026-07-31</div></td><td>181 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:33%;background:#ef4444;"></div></div><span style="font-size:11px;font-weight:600;color:#ef4444;">33%</span></div></td><td><span class="status-chip chip-progress">In Progress</span></td><td>60/181</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">6</td><td><div class="prog-name">Sleep 8 Hours Daily</div><div style="font-size:10px;color:#334155;">2026-01-15 → 2026-03-15</div></td><td>60 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:100%;background:#22c55e;"></div></div><span style="font-size:11px;font-weight:600;color:#22c55e;">100%</span></div></td><td><span class="status-chip chip-complete">Completed</span></td><td>60/60</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+        <tr><td style="color:#334155;">7</td><td><div class="prog-name">No Phone Before 10am</div><div style="font-size:10px;color:#334155;">2026-06-01 → 2026-08-31</div></td><td>92 Days</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="inline-bar"><div class="inline-fill" style="width:0%;background:#3b82f6;"></div></div><span style="font-size:11px;font-weight:600;color:#3b82f6;">0%</span></div></td><td><span class="status-chip chip-notstarted">Not Started</span></td><td>0/92</td><td><span style="color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:3px;"></i>Open</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ANALYTICS MOTIVATION -->
+  <div class="analytics-motivation">
+    <div class="analytics-motivation-bg"></div>
+    <div class="analytics-motivation-animated-bg"><span></span><span></span><span></span><span></span><span></span></div>
+    <button class="a-quote-arrow" onclick="prevAQuote()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="a-motivation-center">
+      <div class="a-quote-tag"><i class="fa-solid fa-quote-left"></i> &nbsp; DAILY MOTIVATION &nbsp; <i class="fa-solid fa-quote-right"></i></div>
+      <div class="a-quote-text" id="analyticsQuoteText"></div>
+      <div class="a-quote-dots" id="analyticsQuoteDots"></div>
+    </div>
+    <button class="a-quote-arrow" onclick="nextAQuote()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+</div><!-- end analyticsPage -->
+
+<!-- ═══════════════ SAVED PAGE ═══════════════ -->
+<div class="saved-page" id="savedPage">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1><i class="fa-solid fa-bookmark"></i> Saved Progress</h1>
+      <p>All your saved progress in one place (Demo Data)</p>
+    </div>
+  </div>
+
+  <!-- STAT CARDS 4col -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;animation:cardPop .6s ease both;">
+    <div class="stat-card blue"><div class="st-icon"><i class="fa-solid fa-chart-line"></i></div><div class="st-num">7</div><div class="st-label">Total Progress</div><div class="st-sub"><i class="fa-solid fa-layer-group" style="font-size:9px;"></i> All</div></div>
+    <div class="stat-card green"><div class="st-icon"><i class="fa-solid fa-circle-check"></i></div><div class="st-num">2</div><div class="st-label">Completed</div><div class="st-sub"><i class="fa-solid fa-check" style="font-size:9px;"></i> Done</div></div>
+    <div class="stat-card" style="--glow:rgba(239,68,68,.08);"><div class="st-icon" style="background:rgba(239,68,68,.1);color:#ef4444;"><i class="fa-solid fa-circle-xmark"></i></div><div class="st-num" style="color:#ef4444;">142</div><div class="st-label">Incomplete Days</div><div class="st-sub" style="background:rgba(239,68,68,.1);color:#ef4444;"><i class="fa-solid fa-xmark" style="font-size:9px;"></i> Missed</div></div>
+    <div class="stat-card" style="--glow:rgba(250,204,21,.08);"><div class="st-icon" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-hourglass-half"></i></div><div class="st-num" style="color:#facc15;">267</div><div class="st-label">Pending Days</div><div class="st-sub" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-clock" style="font-size:9px;"></i> Upcoming</div></div>
+  </div>
+
+  <!-- RECENT + FAVORITES -->
+  <div class="mid-row" style="animation:cardPop .6s .1s ease both;">
+    <div class="section-card">
+      <div class="section-head"><div class="section-title"><i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> Recently Opened</div><div class="section-sub">Last 5 opened</div></div>
+      <div class="activity-item"><div class="act-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fa-solid fa-code"></i></div><div><div class="act-name">Learn DSA — 100 Days</div><div class="act-date">Opened Jun 1, 2026</div></div><div class="act-pct" style="color:#3b82f6;">85%</div></div>
+      <div class="activity-item"><div class="act-icon" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-dumbbell"></i></div><div><div class="act-name">Morning Workout Streak</div><div class="act-date">Opened May 31, 2026</div></div><div class="act-pct" style="color:#00ff88;">72%</div></div>
+      <div class="activity-item"><div class="act-icon" style="background:rgba(168,85,247,.12);color:#a855f7;"><i class="fa-solid fa-book"></i></div><div><div class="act-name">Read 12 Books This Year</div><div class="act-date">Opened May 30, 2026</div></div><div class="act-pct" style="color:#a855f7;">58%</div></div>
+    </div>
+    <div class="section-card">
+      <div class="section-head"><div class="section-title"><i class="fa-solid fa-star" style="color:#facc15;"></i> Favorites</div><div class="section-sub">Your starred progress</div></div>
+      <div class="activity-item"><div class="act-icon" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-star"></i></div><div><div class="act-name">Morning Workout Streak</div><div class="act-date">2026-03-01 → 2026-08-31</div></div><div class="act-pct" style="color:#facc15;">72%</div></div>
+      <div class="activity-item"><div class="act-icon" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-star"></i></div><div><div class="act-name">Learn DSA — 100 Days</div><div class="act-date">2026-01-01 → 2026-04-10</div></div><div class="act-pct" style="color:#22c55e;">85%</div></div>
+      <div style="text-align:center;padding:16px;color:#334155;font-size:12px;border:1px dashed rgba(255,255,255,.06);border-radius:10px;margin-top:8px;">
+        <i class="fa-regular fa-star" style="display:block;font-size:18px;margin-bottom:6px;opacity:.4;"></i>
+        Sign up to add favorites!
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED PROGRESS LIST (same as dashboard) -->
+  <div class="progress-section" style="animation:cardPop .6s .2s ease both;">
+    <div class="progress-section-head">
+      <div class="progress-section-title"><i class="fa-solid fa-list-check" style="color:#00ff88;font-size:16px;"></i> All Saved Progress</div>
+    </div>
+    <div class="progress-card"><div class="progress-icon-wrap" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fa-solid fa-code"></i></div><div class="progress-info"><h4>Learn DSA — 100 Days <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#facc15;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);padding:2px 7px;border-radius:9px;margin-left:5px;"><i class="fa-solid fa-star" style="font-size:8px;"></i> Favorite</span></h4><span>2026-01-01 → 2026-04-10</span></div><div class="progress-bar-wrap"><div class="p-bar"><div class="p-fill" style="width:85%;background:#3b82f6;"></div></div><div class="p-pct" style="color:#3b82f6;">85%</div></div><div class="p-status" style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);">Completed</div><button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button></div>
+    <div class="progress-card"><div class="progress-icon-wrap" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-dumbbell"></i></div><div class="progress-info"><h4>Morning Workout Streak <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#facc15;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);padding:2px 7px;border-radius:9px;margin-left:5px;"><i class="fa-solid fa-star" style="font-size:8px;"></i> Favorite</span></h4><span>2026-03-01 → 2026-08-31</span></div><div class="progress-bar-wrap"><div class="p-bar"><div class="p-fill" style="width:72%;background:#facc15;"></div></div><div class="p-pct" style="color:#facc15;">72%</div></div><div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div><button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button></div>
+    <div class="progress-card"><div class="progress-icon-wrap" style="background:rgba(168,85,247,.12);color:#a855f7;"><i class="fa-solid fa-book"></i></div><div class="progress-info"><h4>Read 12 Books This Year</h4><span>2026-01-01 → 2026-12-31</span></div><div class="progress-bar-wrap"><div class="p-bar"><div class="p-fill" style="width:58%;background:#a855f7;"></div></div><div class="p-pct" style="color:#a855f7;">58%</div></div><div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div><button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button></div>
+    <div class="progress-card"><div class="progress-icon-wrap" style="background:rgba(250,204,21,.1);color:#facc15;"><i class="fa-solid fa-paintbrush"></i></div><div class="progress-info"><h4>Daily Sketching Habit</h4><span>2026-04-01 → 2026-09-30</span></div><div class="progress-bar-wrap"><div class="p-bar"><div class="p-fill" style="width:40%;background:#facc15;"></div></div><div class="p-pct" style="color:#facc15;">40%</div></div><div class="p-status" style="background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);">In Progress</div><button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button></div>
+    <div class="progress-card"><div class="progress-icon-wrap" style="background:rgba(0,255,136,.1);color:#00ff88;"><i class="fa-solid fa-moon"></i></div><div class="progress-info"><h4>Sleep 8 Hours Daily</h4><span>2026-01-15 → 2026-03-15</span></div><div class="progress-bar-wrap"><div class="p-bar"><div class="p-fill" style="width:100%;background:#22c55e;"></div></div><div class="p-pct" style="color:#22c55e;">100%</div></div><div class="p-status" style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);">Completed</div><button class="p-open-btn" onclick="showLocked('tracker')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</button></div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;padding:48px 24px;border-radius:20px;background:linear-gradient(145deg,rgba(0,255,136,.04),rgba(0,255,136,.01));border:1px solid rgba(0,255,136,.12);margin-top:22px;animation:cardPop .6s .3s ease both;">
+    <div style="font-size:28px;margin-bottom:14px;">🎯</div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px;">Ready to track YOUR goals?</h2>
+    <p style="color:#64748b;font-size:15px;margin-bottom:24px;line-height:1.7;">Sign up for free and start building consistency — no card, no limits.</p>
+    <button class="create-btn-1" onclick="window.location.href='login.html?tab=signup'" style="display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:14px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:.3s;box-shadow:0 0 24px rgba(0,255,136,.3);font-family:'Poppins',sans-serif;">
+      <i class="fa-solid fa-rocket"></i> Create Free Account
+    </button>
+  </div>
+
+</div><!-- end savedPage -->
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <div class="footer-top">
+    <span class="footer-link"><i class="fa-regular fa-envelope"></i> Support</span>
+    <span class="footer-link"><i class="fa-regular fa-comment-dots"></i> Feedback</span>
+    <span class="footer-link"><i class="fa-solid fa-file-lines"></i> Terms & Conditions</span>
+  </div>
+  <div class="footer-copy">© Progress Tracker 2026 — Demo Mode · <span style="color:#00ff88; cursor: pointer;" onclick="window.location.href='login.html?tab=signup'">Sign up </span> to access real features</div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+/* ── TAB SWITCHING ── */
+let currentTab='dashboard';
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('dashboardPage').style.display = tab==='dashboard' ? 'block':'none';
+  document.getElementById('analyticsPage').style.display = tab==='analytics' ? 'block':'none';
+  document.getElementById('savedPage').style.display     = tab==='saved'     ? 'block':'none';
+  document.querySelectorAll('.demo-tab:not(.demo-tab-locked)').forEach(t=>t.classList.remove('active'));
+  const map={dashboard:0,analytics:1,saved:2};
+  const tabs=document.querySelectorAll('.demo-tab:not(.demo-tab-locked)');
+  if(tabs[map[tab]]) tabs[map[tab]].classList.add('active');
+
+  if(tab==='analytics'){
+    setTimeout(()=>{
+      initAnalyticsCharts();
+      renderHeatmap();
+      renderAQuote();
+    },50);
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── LOCKED OVERLAY ── */
+const lockedNames={
+  tracker:'Progress Tracker',
+  create:'Create Progress',
+  achievements:'Achievements',
+  calendar:'Calendar View',
+  notifications:'Notifications',
+};
+function showLocked(feat){
+  document.getElementById('lockedFeatureName').innerText=lockedNames[feat]||feat;
+  document.getElementById('lockedOverlay').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeLocked(){
+  document.getElementById('lockedOverlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.getElementById('lockedOverlay').addEventListener('click',function(e){
+  if(e.target===this) closeLocked();
+});
+
+/* ── DASHBOARD QUOTES ── */
+const quotes=[
+  "Discipline today <span>leads to success</span> tomorrow.",
+  "Small progress every day creates <span>big results</span>.",
+  "Stay consistent and never <span>give up</span>.",
+  "Focus on progress, not <span>perfection</span>.",
+  "Your future is created by what you do <span>today</span>.",
+  "Track it. <span>Own it.</span> Achieve it.",
+  "Every expert was once <span>a beginner</span>. Keep going.",
+  "Consistency is the <span>key to mastery</span>.",
+];
+let qIdx=0,qTimer=null;
+function renderQuote(){
+  let el=document.getElementById('dashQuoteText'),dots=document.getElementById('dashQuoteDots');
+  if(!el||!dots) return;
+  el.style.opacity='0';el.style.transform='translateX(20px)';
+  setTimeout(()=>{el.innerHTML=quotes[qIdx];el.style.opacity='1';el.style.transform='translateX(0)';},280);
+  dots.innerHTML=quotes.map((_,i)=>`<div class="quote-dot${i===qIdx?' active':''}" onclick="goQ(${i})"></div>`).join('');
+}
+function nextQuote(){qIdx=(qIdx+1)%quotes.length;renderQuote();resetQTimer();}
+function prevQuote(){qIdx=(qIdx-1+quotes.length)%quotes.length;renderQuote();resetQTimer();}
+function goQ(i){qIdx=i;renderQuote();resetQTimer();}
+function resetQTimer(){if(qTimer)clearInterval(qTimer);qTimer=setInterval(nextQuote,3200);}
+renderQuote();resetQTimer();
+
+/* ── ANALYTICS QUOTES ── */
+const aQuotes=[
+  "Discipline today <span>leads to success</span> tomorrow.",
+  "Stay consistent and never <span>give up</span>.",
+  "Focus on progress, not <span>perfection</span>.",
+  "Your future is created by what you do <span>today</span>.",
+  "Consistency is the <span>key to mastery</span>.",
+];
+let aQIdx=0,aQTimer=null;
+function renderAQuote(){
+  let el=document.getElementById('analyticsQuoteText'),dots=document.getElementById('analyticsQuoteDots');
+  if(!el||!dots) return;
+  el.style.opacity='0';
+  setTimeout(()=>{el.innerHTML=aQuotes[aQIdx];el.style.opacity='1';},220);
+  dots.innerHTML=aQuotes.map((_,i)=>`<div class="a-quote-dot${i===aQIdx?' active':''}" onclick="goAQ(${i})"></div>`).join('');
+}
+function nextAQuote(){aQIdx=(aQIdx+1)%aQuotes.length;renderAQuote();resetAQTimer();}
+function prevAQuote(){aQIdx=(aQIdx-1+aQuotes.length)%aQuotes.length;renderAQuote();resetAQTimer();}
+function goAQ(i){aQIdx=i;renderAQuote();resetAQTimer();}
+function resetAQTimer(){if(aQTimer)clearInterval(aQTimer);aQTimer=setInterval(nextAQuote,3200);}
+
+/* ── ANALYTICS FILTER ── */
+let filterDays=30;
+function setFilter(days,btn){
+  filterDays=days;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  initAnalyticsCharts();
+}
+
+/* ── DEMO CHART TYPE ── */
+let demoChartType='line';
+let mainChart=null,donutChart=null,streakChart=null;
+function switchDemoChart(type,btn){
+  demoChartType=type;
+  document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  initMainChart();
+}
+
+/* ── GENERATE DEMO DATA ── */
+function genDemoData(days){
+  let base=[75,72,68,80,85,60,55,78,82,90,65,70,88,92,85,78,72,68,75,80,85,70,60,88,92,95,80,75,70,85];
+  let out=[];
+  for(let i=0;i<days;i++){
+    let v=base[i%base.length]+Math.floor(Math.random()*10-5);
+    out.push(Math.min(100,Math.max(0,v)));
+  }
+  return out;
+}
+
+function initMainChart(){
+  let d=filterDays===0?60:filterDays;
+  let vals=genDemoData(d);
+  let today=new Date();
+  let labels=[];
+  for(let i=d-1;i>=0;i--){
+    let dt=new Date(today);dt.setDate(dt.getDate()-i);
+    labels.push(dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  }
+  let skip=d>30?7:d>14?3:1;
+  let displayLabels=labels.map((l,i)=>i%skip===0?l:'');
+
+  let ctx=document.getElementById('demoMainChart');
+  if(!ctx) return;
+  if(mainChart) mainChart.destroy();
+
+  if(demoChartType==='line'){
+    mainChart=new Chart(ctx,{type:'line',data:{labels:displayLabels,datasets:[{data:vals,borderColor:'#00ff88',backgroundColor:(c)=>{let{ctx:cx,chartArea:ca}=c.chart;if(!ca)return;let g=cx.createLinearGradient(0,ca.top,0,ca.bottom);g.addColorStop(0,'rgba(0,255,136,.18)');g.addColorStop(1,'rgba(0,255,136,0)');return g;},fill:true,tension:.42,borderWidth:3,pointRadius:3,pointBackgroundColor:'#00ff88',pointBorderColor:'#050505',pointBorderWidth:2,segment:{borderColor:c=>c.p1.parsed.y<c.p0.parsed.y?'#ef4444':'#00ff88'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#334155',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'}},y:{min:0,max:100,ticks:{color:'#334155',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  } else {
+    let comp=vals.map(v=>Math.round(v/100*3));
+    let incomp=comp.map(c=>3-c);
+    mainChart=new Chart(ctx,{type:'bar',data:{labels:displayLabels,datasets:[{label:'Completed',data:comp,backgroundColor:'rgba(0,255,136,.7)',borderRadius:3},{label:'Incomplete',data:incomp,backgroundColor:'rgba(239,68,68,.5)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#64748b',font:{size:11}}}},scales:{x:{ticks:{color:'#334155',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{color:'#334155',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},stacked:true}}});
+  }
+}
+
+function initDonutChart(){
+  let ctx=document.getElementById('demoDonutChart');
+  if(!ctx) return;
+  if(donutChart) donutChart.destroy();
+  donutChart=new Chart(ctx,{type:'doughnut',data:{labels:['Completed','Active','Not Started'],datasets:[{data:[2,4,1],backgroundColor:['#00ff88','#a855f7','#ef4444'],borderColor:'#050505',borderWidth:3,hoverOffset:6}]},options:{responsive:false,cutout:'68%',plugins:{legend:{display:false}}}});
+}
+
+function initStreakChart(){
+  let ctx=document.getElementById('demoStreakChart');
+  if(!ctx) return;
+  if(streakChart) streakChart.destroy();
+  streakChart=new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[14,100-14],backgroundColor:['#facc15','rgba(255,255,255,.04)'],borderColor:'transparent',borderWidth:0}]},options:{responsive:false,cutout:'75%',plugins:{legend:{display:false}},animation:{duration:1000}}});
+}
+
+function renderHeatmap(){
+  let el=document.getElementById('demoHeatmap');
+  if(!el) return;
+  let weeks=10;
+  let days=['S','M','T','W','T','F','S'];
+  let daysHtml=days.map(d=>`<span style="font-size:10px;color:#334155;width:20px;text-align:center;display:inline-block;">${d}</span>`).join('');
+  let rows='';
+  const scores=[[0,1,2,3,3,2,1],[2,3,4,5,3,2,1],[1,2,3,2,4,5,3],[3,4,5,4,3,2,1],[2,3,4,3,2,3,4],[4,5,4,3,4,5,4],[3,4,5,5,4,3,2],[2,3,4,4,3,4,5],[4,5,5,4,5,5,4],[5,5,4,5,5,4,5]];
+  for(let w=0;w<weeks;w++){
+    let cells=scores[w].map(s=>{
+      let cls=s===0?'hm-0':s===1?'hm-1':s===2?'hm-2':s===3?'hm-3':s===4?'hm-4':'hm-5';
+      return `<div class="hm-cell ${cls}" style="width:20px;height:20px;border-radius:3px;"></div>`;
+    }).join('');
+    rows+=`<div class="hm-row" style="display:flex;gap:4px;margin-bottom:4px;">${cells}</div>`;
+  }
+  el.innerHTML=`<div style="display:flex;gap:4px;margin-bottom:6px;">${daysHtml}</div>${rows}
+  <div style="display:flex;align-items:center;gap:5px;margin-top:10px;">
+    <span style="font-size:10px;color:#334155;">Less</span>
+    <div class="hm-cell hm-0" style="width:14px;height:14px;border-radius:3px;"></div>
+    <div class="hm-cell hm-2" style="width:14px;height:14px;border-radius:3px;"></div>
+    <div class="hm-cell hm-3" style="width:14px;height:14px;border-radius:3px;"></div>
+    <div class="hm-cell hm-4" style="width:14px;height:14px;border-radius:3px;"></div>
+    <div class="hm-cell hm-5" style="width:14px;height:14px;border-radius:3px;"></div>
+    <span style="font-size:10px;color:#334155;">More</span>
+  </div>`;
+}
+
+function initAnalyticsCharts(){
+  initMainChart();
+  initDonutChart();
+  initStreakChart();
+}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - Progress Tracker</title>
+  <link rel="icon" type="png" href="main icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+    body{background:#050505;color:white;overflow-x:hidden;min-height:100vh;}
+
+    /* ── NAVBAR ── */
+    .navbar{width:100%;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 50px;background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);position:fixed;top:0;z-index:1000;}
+    .nav-left{display:flex;align-items:center;gap:14px;}
+    .nav-left img{width:120px;height:auto;cursor:pointer;}
+    .nav-right{display:flex;align-items:center;gap:10px;}
+    .create-nav-btn{display:flex;align-items:center;gap:10px;padding:0 20px;height:40px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:13px;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:.3s;letter-spacing:.3px;box-shadow:0 0 20px rgba(0,255,136,.25);font-family:'Poppins',sans-serif;}
+    .create-nav-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,136,.4);background:linear-gradient(135deg,#00ff95,#00e5b5);}
+    .create-nav-btn i{font-size:12px;}
+    .nav-icon-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;transition:.25s;font-size:16px;}
+    .nav-icon-btn:hover{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:#00ff88;}
+    .analytics-nav-btn{display:flex;align-items:center;gap:8px;padding:0 18px;height:40px;background:rgba(0,255,136,.10);border:1px solid rgba(0,255,136,.3);color:#00ff88;font-size:13px;font-weight:500;border-radius:12px;cursor:pointer;transition:.25s;}
+    .analytics-nav-btn i{font-size:13px;}
+    .menu-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.25s;border:1px solid rgba(255,255,255,.08);}
+    .menu-icon i{font-size:18px;color:white;}
+    .menu-icon:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18);}
+
+    /* ── NOTIFICATION BTN ── */
+    .notif-btn-wrap{position:relative;}
+    .notif-count{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:20px;background:#ef4444;color:white;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 8px rgba(239,68,68,.5);}
+    .notif-count.show{display:flex;}
+    .notif-popup{position:fixed;top:78px;right:50px;width:380px;max-height:520px;background:linear-gradient(145deg,rgba(10,10,10,.98),rgba(6,6,6,.98));border:1px solid rgba(255,255,255,.08);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:99998;display:none;overflow:hidden;animation:notifPop .25s ease;}
+    .notif-popup.show{display:block;}
+    @keyframes notifPop{from{opacity:0;transform:translateY(-10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .notif-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .notif-header h3{font-size:15px;font-weight:700;color:#e2e8f0;}
+    .notif-header-actions{display:flex;align-items:center;gap:10px;}
+    .notif-mark-read-btn{font-size:11px;color:#3b82f6;cursor:pointer;font-weight:500;padding:4px 8px;border-radius:6px;border:1px solid rgba(59,130,246,.2);background:rgba(59,130,246,.08);transition:.2s;}
+    .notif-mark-read-btn:hover{background:rgba(59,130,246,.15);}
+    .notif-clear-btn{font-size:12px;color:#00ff88;cursor:pointer;font-weight:500;}
+    .notif-list{max-height:400px;overflow-y:auto;padding:8px;}
+    .notif-list::-webkit-scrollbar{width:3px;}
+    .notif-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:20px;}
+    .notif-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);margin-bottom:8px;transition:.25s;}
+    .notif-item.unread{background:rgba(0,255,136,.03);border-color:rgba(0,255,136,.1);}
+    .notif-item:hover{background:rgba(255,255,255,.04);}
+    .notif-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .notif-text{flex:1;}
+    .notif-title{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:3px;}
+    .notif-desc{font-size:12px;color:#64748b;line-height:1.5;}
+    .notif-time{font-size:10px;color:#334155;margin-top:4px;}
+    .notif-empty{text-align:center;padding:30px;color:#334155;font-size:14px;}
+    .notif-empty i{font-size:28px;display:block;margin-bottom:10px;opacity:.4;}
+
+    /* ── PROFILE POPUP ── */
+    .profile-popup{position:fixed;top:78px;right:50px;width:260px;background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));border:1px solid rgba(255,255,255,.1);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.7);z-index:99998;display:none;overflow:hidden;animation:notifPop .25s ease;}
+    .profile-popup.show{display:block;}
+    .profile-popup-top{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;}
+    .profile-popup-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,136,.2),rgba(0,212,170,.1));border:1px solid rgba(0,255,136,.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:#00ff88;flex-shrink:0;}
+    .profile-popup-name{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:3px;}
+    .profile-popup-email{font-size:11px;color:#475569;}
+    .profile-popup-menu{padding:8px;}
+    .profile-menu-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;cursor:pointer;transition:.25s;color:#94a3b8;font-size:13px;font-weight:500;}
+    .profile-menu-item i{width:16px;text-align:center;font-size:14px;}
+    .profile-menu-item:hover{background:rgba(255,255,255,.05);color:white;}
+    .profile-menu-item.logout-item{color:#ef4444;margin-top:4px;border-top:1px solid rgba(255,255,255,.05);padding-top:11px;}
+    .profile-menu-item.logout-item:hover{background:rgba(239,68,68,.1);color:#ef4444;}
+
+    /* ── TOOLTIP ── */
+    .tooltip-btn{position:relative;}
+    .tooltip{position:absolute;top:58px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:6px 14px;border-radius:10px;font-size:14px;font-weight:500;border:1px solid #2a2a2a;white-space:nowrap;opacity:0;visibility:hidden;transition:0.25s ease;z-index:999;}
+    .tooltip-btn:hover .tooltip{opacity:1;visibility:visible;top:65px;}
+    .tooltip::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:#111;border-left:1px solid #2a2a2a;border-top:1px solid #2a2a2a;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{position:fixed;top:0;left:-240px;width:240px;height:100vh;background:rgba(5,5,5,0.97);border-right:1px solid rgba(255,255,255,.06);z-index:99999;transition:.35s ease;display:flex;flex-direction:column;backdrop-filter:blur(20px);}
+    .sidebar.open{left:0;}
+    .sidebar-logo{display:flex;align-items:center;justify-content:center;padding:24px 20px 10px;border-bottom:1px solid rgba(255,255,255,.04);}
+    .sidebar-logo img{width:130px;height:auto;}
+    .side-menu{padding:14px 10px;overflow-y:auto;flex:1;}
+    .side-menu::-webkit-scrollbar{width:3px;}
+    .side-menu::-webkit-scrollbar-thumb{background:rgba(0,255,140,.15);border-radius:20px;}
+    .side-item{width:100%;height:50px;display:flex;align-items:center;gap:12px;padding:0 14px;margin-bottom:6px;border-radius:14px;cursor:pointer;transition:.25s;color:#94a3b8;}
+    .side-item.active{background:linear-gradient(90deg,rgba(0,255,136,.1),rgba(0,255,136,.04));border:1px solid rgba(0,255,136,.15);color:white;box-shadow:inset 3px 0 0 #00ff88;}
+    .side-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);font-size:14px;color:#64748b;flex-shrink:0;transition:.25s;}
+    .side-item.active .side-icon{background:rgba(0,255,136,.12);color:#00ff88;}
+    .side-item:hover{background:rgba(255,255,255,.04);color:white;transform:translateX(3px);}
+    .side-item:hover .side-icon{background:rgba(0,255,136,.08);color:#00ff88;}
+    .side-item span{font-size:14px;font-weight:500;}
+    .sidebar-bottom{padding:10px;border-top:1px solid rgba(255,255,255,.04);}
+    .side-motivation-box{padding:14px;border-radius:14px;background:linear-gradient(145deg,rgba(255,170,0,.07),rgba(255,140,0,.03));border:1px solid rgba(255,170,0,.15);margin-bottom:10px;position:relative;overflow:hidden;}
+    .side-motivation-box::before{content:'';position:absolute;width:80px;height:80px;top:-30px;right:-20px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,0,.15),transparent 70%);pointer-events:none;}
+    .side-motivation-text{font-size:11px;color:#f59e0b;font-weight:500;line-height:1.5;margin-bottom:8px;}
+    .side-motivation-quote{font-size:10px;color:#78716c;font-style:italic;line-height:1.4;transition:opacity .3s ease;}
+    .side-logout-btn{width:100%;height:44px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:14px;cursor:pointer;transition:.25s;color:#ef4444;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.12);}
+    .side-logout-btn:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);}
+    .side-logout-btn .side-icon{background:rgba(239,68,68,.1);color:#ef4444;}
+    .side-logout-btn span{font-size:14px;font-weight:500;}
+    .side-close-outside{position:fixed;top:24px;left:190px;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.9);border:1px solid rgba(255,255,255,.12);color:white;font-size:22px;cursor:pointer;z-index:100000;backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:left .35s ease,opacity .25s ease;}
+    .sidebar.open ~ .side-close-outside{left:250px;opacity:1;visibility:visible;}
+    .side-close-outside:hover{border:1px solid rgba(255,255,255,0.236);background:rgba(30,29,29,0.816);transition:.3s ease;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.3s ease;z-index:1500;}
+    .overlay.show{opacity:1;visibility:visible;}
+
+    /* ── LOGOUT CONFIRM ── */
+    .logout-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:20px;}
+    .logout-confirm-overlay.show{display:flex;}
+    .logout-confirm-modal{width:100%;max-width:400px;background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px;text-align:center;animation:popupAnim .3s ease;}
+    @keyframes popupAnim{from{opacity:0;transform:scale(.95) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .logout-confirm-icon{width:60px;height:60px;border-radius:18px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:26px;color:#ef4444;margin:0 auto 18px;}
+    .logout-confirm-title{font-size:20px;font-weight:700;color:#e2e8f0;margin-bottom:8px;}
+    .logout-confirm-desc{font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.5;}
+    .logout-confirm-btns{display:flex;gap:10px;}
+    .logout-cancel-btn{flex:1;height:44px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:14px;font-weight:500;cursor:pointer;transition:.25s;font-family:'Poppins',sans-serif;}
+    .logout-cancel-btn:hover{background:rgba(255,255,255,.08);color:white;}
+    .logout-ok-btn{flex:1;height:44px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Poppins',sans-serif;}
+    .logout-ok-btn:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(239,68,68,.35);}
+
+    /* ── MAIN ── */
+    .main{max-width:1280px;margin:auto;padding:100px 30px 60px;}
+
+    /* ── PAGE HEADER ── */
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;animation:fadeUp .7s ease forwards;flex-wrap:wrap;gap:16px;}
+    .page-header-left h1{font-size:36px;font-weight:700;letter-spacing:-1px;display:flex;align-items:center;gap:14px;}
+    .page-header-left h1 i{color:#00ff88;font-size:30px;}
+    .page-header-left p{color:#64748b;font-size:15px;margin-top:6px;}
+    .filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filter-btn{padding:9px 18px;border-radius:12px;font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,0.08);background:#0a0a0a;color:#94a3b8;cursor:pointer;transition:.25s;}
+    .filter-btn.active{background:rgba(0,255,136,.10);color:#00ff88;border-color:rgba(0,255,136,.3);}
+    .filter-btn:hover{border-color:rgba(255,255,255,.18);color:white;}
+
+    /* ── OVERVIEW STAT CARDS ── */
+    .overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;animation:fadeUp .7s .1s ease both;}
+    .ov-card{padding:22px;border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);transition:.3s;position:relative;overflow:hidden;}
+    .ov-card::after{content:"";position:absolute;width:120px;height:120px;top:-50px;right:-50px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);pointer-events:none;}
+    .ov-card:hover{transform:translateY(-5px);box-shadow:0 0 40px var(--glow);border-color:rgba(255,255,255,.12);}
+    .ov-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;}
+    .ov-num{font-size:44px;font-weight:700;line-height:1;margin-bottom:6px;}
+    .ov-label{font-size:13px;color:#64748b;}
+    .ov-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+    .ov-card.blue{--glow:rgba(59,130,246,0.08);}
+    .ov-card.blue .ov-icon{background:rgba(59,130,246,.12);color:#3b82f6;box-shadow:0 0 20px rgba(59,130,246,.2);}
+    .ov-card.blue .ov-num{color:#3b82f6;}
+    .ov-card.blue .ov-badge{background:rgba(59,130,246,.12);color:#3b82f6;}
+    .ov-card.green{--glow:rgba(0,255,136,0.08);}
+    .ov-card.green .ov-icon{background:rgba(0,255,136,.10);color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,.2);}
+    .ov-card.green .ov-num{color:#00ff88;text-shadow:0 0 20px rgba(0,255,136,.4);}
+    .ov-card.green .ov-badge{background:rgba(0,255,136,.10);color:#00ff88;}
+    .ov-card.purple{--glow:rgba(168,85,247,0.08);}
+    .ov-card.purple .ov-icon{background:rgba(168,85,247,.12);color:#a855f7;box-shadow:0 0 20px rgba(168,85,247,.2);}
+    .ov-card.purple .ov-num{color:#a855f7;}
+    .ov-card.purple .ov-badge{background:rgba(168,85,247,.12);color:#a855f7;}
+    .ov-card.amber{--glow:rgba(250,204,21,0.08);}
+    .ov-card.amber .ov-icon{background:rgba(250,204,21,.10);color:#facc15;box-shadow:0 0 20px rgba(250,204,21,.2);}
+    .ov-card.amber .ov-num{color:#facc15;text-shadow:0 0 20px rgba(250,204,21,.4);}
+    .ov-card.amber .ov-badge{background:rgba(250,204,21,.10);color:#facc15;}
+
+    /* ── CHARTS ROW ── */
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:22px;animation:fadeUp .7s .2s ease both;}
+    .chart-card{background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:24px;}
+    .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .chart-title{font-size:16px;font-weight:600;color:#e2e8f0;}
+    .chart-sub{font-size:12px;color:#475569;margin-top:3px;}
+    .tab-pills{display:flex;gap:6px;}
+    .tab-pill{padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;transition:.2s;color:#64748b;border:1px solid transparent;background:transparent;}
+    .tab-pill.active{background:#111;color:#fff;border-color:rgba(255,255,255,.1);}
+    .bar-area{height:220px;position:relative;}
+    .donut-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:8px 0;}
+    .donut-area canvas{width:140px!important;height:140px!important;}
+    .donut-legend{width:100%;}
+    .legend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+    .legend-row:last-child{border-bottom:none;}
+    .legend-left{display:flex;align-items:center;gap:10px;color:#94a3b8;}
+    .legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .legend-val{font-weight:600;font-size:14px;}
+
+    /* ── MID ROW ── */
+    .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;animation:fadeUp .7s .3s ease both;}
+    .heatmap-days{display:flex;justify-content:space-between;margin-bottom:8px;}
+    .hm-day-label{font-size:10px;color:#334155;}
+    .heatmap-weeks{display:flex;flex-direction:column;gap:5px;}
+    .hm-row{display:flex;gap:5px;}
+    .hm-cell{width:22px;height:22px;border-radius:4px;cursor:pointer;transition:.2s;}
+    .hm-cell:hover{transform:scale(1.2);}
+    .hm-0{background:#0f172a;}.hm-1{background:#14532d;}.hm-2{background:#166534;}.hm-3{background:#16a34a;}.hm-4{background:#22c55e;}.hm-5{background:#4ade80;}
+    .hm-legend-row{display:flex;align-items:center;gap:6px;margin-top:14px;}
+    .hm-legend-label{font-size:10px;color:#334155;}
+    .hm-legend-cell{width:14px;height:14px;border-radius:3px;}
+    .goal-progress-list{display:flex;flex-direction:column;gap:10px;}
+    .gp-item{padding:14px;border-radius:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px;transition:.25s;}
+    .gp-item:hover{background:rgba(255,255,255,.03);transform:translateX(4px);}
+    .gp-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+    .gp-info{flex:1;min-width:0;}
+    .gp-name{font-size:13px;font-weight:500;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .gp-meta{font-size:11px;color:#475569;margin-top:3px;}
+    .gp-right{width:100px;flex-shrink:0;}
+    .gp-bar-bg{height:5px;background:#111;border-radius:3px;overflow:hidden;}
+    .gp-bar-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+    .gp-pct{font-size:11px;color:#64748b;text-align:right;margin-top:4px;}
+
+    /* ── BOTTOM ROW ── */
+    .bottom-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:22px;animation:fadeUp .7s .4s ease both;}
+    .streak-big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 0;}
+    .streak-circle-wrap{position:relative;width:130px;height:130px;margin:auto;}
+    .streak-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .streak-num h2{font-size:38px;color:#facc15;font-weight:700;line-height:1;}
+    .streak-num p{font-size:13px;color:#94a3b8;}
+    .streak-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;width:100%;}
+    .streak-mini-card{padding:12px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);text-align:center;}
+    .streak-mini-card p{font-size:11px;color:#475569;margin-bottom:6px;}
+    .streak-mini-card h3{font-size:20px;font-weight:600;}
+    .insight-list{display:flex;flex-direction:column;gap:10px;}
+    .insight-item{padding:14px;border-radius:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-start;gap:12px;transition:.25s;}
+    .insight-item:hover{background:rgba(255,255,255,.03);}
+    .insight-emoji{font-size:22px;flex-shrink:0;margin-top:2px;}
+    .insight-head{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:3px;}
+    .insight-body{font-size:12px;color:#475569;line-height:1.5;}
+    .meter-section{display:flex;flex-direction:column;gap:16px;}
+    .meter-card{padding:16px;border-radius:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);}
+    .meter-label{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#94a3b8;margin-bottom:10px;}
+    .meter-label span:last-child{font-weight:600;color:white;}
+    .meter-bg{height:8px;background:#0f172a;border-radius:20px;overflow:hidden;}
+    .meter-fill{height:100%;border-radius:20px;transition:width 1s ease;}
+    .radial-wrap{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;margin-top:8px;}
+    .radial-inner{width:76px;height:76px;border-radius:50%;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .radial-inner h2{font-size:18px;color:#00ff88;font-weight:700;margin:0;}
+    .radial-inner p{font-size:10px;color:#475569;}
+
+    /* ── TABLE ── */
+    .table-card{background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:24px;margin-bottom:22px;animation:fadeUp .7s .5s ease both;}
+    .ptable{width:100%;border-collapse:collapse;}
+    .ptable th{text-align:left;padding:10px 16px;font-size:11px;font-weight:600;color:#334155;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid rgba(255,255,255,.05);}
+    .ptable td{padding:14px 16px;font-size:13px;color:#cbd5e1;border-bottom:1px solid rgba(255,255,255,.03);}
+    .ptable tr:last-child td{border-bottom:none;}
+    .ptable tr:hover td{background:rgba(255,255,255,.02);}
+    .ptable .prog-name{font-weight:500;color:#e2e8f0;}
+    .ptable .status-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+    .chip-complete{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);}
+    .chip-progress{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25);}
+    .chip-incomplete{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25);}
+    .ptable .inline-bar{width:120px;height:5px;background:#111;border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px;}
+    .ptable .inline-fill{height:100%;border-radius:3px;}
+    .open-link{color:#3b82f6;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;}
+    .open-link:hover{color:#60a5fa;}
+    .empty-state{text-align:center;padding:80px 20px;color:#334155;}
+    .empty-state i{font-size:48px;margin-bottom:20px;display:block;}
+    .empty-state h2{font-size:24px;margin-bottom:12px;color:#475569;}
+    .empty-state p{font-size:15px;line-height:1.7;}
+    .empty-state a{color:#00ff88;text-decoration:none;font-weight:600;}
+
+    /* ── MOTIVATION BOX ── */
+    .motivation-section{margin-bottom:40px;}
+    .motivation-box{animation:cardPop .7s .1s ease both;position:relative;overflow:hidden;margin-top:30px;border-radius:30px;padding:20px 20px;background:linear-gradient(145deg,#050505,#080808);border:1px solid rgba(168,85,247,.25);min-height:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 0 50px rgba(130,40,255,.06),inset 0 0 40px rgba(130,40,255,.03);}
+    .motivation-bg{position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(168,85,247,.18),transparent 30%),radial-gradient(circle at bottom left,rgba(139,92,246,.1),transparent 25%);opacity:.9;pointer-events:none;}
+    .motivation-center{width:100%;z-index:2;}
+    .quote-tag{display:flex;align-items:center;justify-content:center;gap:14px;color:#a855f7;font-size:15px;letter-spacing:3px;margin-bottom:45px;font-weight:600;}
+    .quote-tag span{width:120px;height:1px;background:linear-gradient(to right,transparent,rgba(168,85,247,.4),transparent);}
+    .motivation-content{display:flex;align-items:center;justify-content:space-between;gap:40px;}
+    .quote-big-icon{width:100px;height:100px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:radial-gradient(circle,rgba(168,85,247,.18),rgba(168,85,247,.03));border:1px solid rgba(168,85,247,.3);box-shadow:0 0 35px rgba(168,85,247,.15);}
+    .quote-big-icon i{font-size:32px;color:#a855f7;z-index:2;text-shadow:0 0 20px rgba(168,85,247,.6);}
+    .quote-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:1px solid rgba(168,85,247,.18);animation:ringPulse 5s linear infinite;}
+    .quote-ring.ring2{transform:scale(1.25);animation-delay:2s;}
+    .quote-main{flex:1;text-align:center;}
+    .quote-text-box{font-size:20px;line-height:1.25;color:white;font-weight:200;max-width:700px;margin:auto;opacity:1;transition:opacity .65s ease,transform .65s cubic-bezier(.22,1,.36,1),filter .65s ease;}
+    .quote-text-box span{color:#a855f7;font-weight:300;text-shadow:0 0 18px rgba(168,85,247,.5);}
+    .quote-dots-wrap{display:flex;justify-content:center;gap:10px;margin-top:32px;}
+    .quote-dot{width:8px;height:8px;border-radius:20px;background:#343434;transition:.4s;cursor:pointer;}
+    .quote-dot.active{width:22px;background:#a855f7;box-shadow:0 0 20px rgba(168,85,247,.8);}
+    .mini-motivation-card{width:200px;height:70px;padding:20px;border-radius:17px;background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:20px;margin-right:30px;backdrop-filter:blur(20px);box-shadow:0 10px 35px rgba(0,0,0,.45);}
+    .mini-icon{width:5px;height:10px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(145deg,rgba(168,85,247,.18),rgba(168,85,247,.06));box-shadow:0 0 25px rgba(168,85,247,.18);}
+    .mini-motivation-card h4{color:white;font-size:12px;margin-bottom:6px;font-weight:400;}
+    .mini-motivation-card p{color:#8a8a8a;font-size:10px;}
+    .quote-arrow-btn{width:52px;height:52px;border-radius:50%;border:1px solid rgba(168,85,247,.2);background:rgba(168,85,247,.05);color:#a855f7;font-size:18px;cursor:pointer;transition:.35s;flex-shrink:0;z-index:2;}
+    .quote-arrow-btn:hover{background:rgba(168,85,247,.12);}
+    @keyframes ringPulse{0%{transform:scale(1);opacity:.5;}50%{transform:scale(1.12);opacity:.15;}100%{transform:scale(1);opacity:.5;}}
+    .motivation-animated-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+    .motivation-animated-bg span{position:absolute;width:6px;height:3px;border-radius:50%;background:#a855f7;box-shadow:0 0 10px #a855f7,0 0 20px rgba(168,85,247,.7);animation:floatDots linear infinite;}
+    .motivation-animated-bg span:nth-child(1){left:10%;top:70%;animation-duration:7s;}
+    .motivation-animated-bg span:nth-child(2){left:28%;top:35%;animation-duration:9s;width:4px;height:4px;}
+    .motivation-animated-bg span:nth-child(3){left:55%;top:75%;animation-duration:11s;}
+    .motivation-animated-bg span:nth-child(4){left:72%;top:25%;animation-duration:8s;width:5px;height:5px;}
+    .motivation-animated-bg span:nth-child(5){left:88%;top:65%;animation-duration:12s;}
+    @keyframes floatDots{0%{transform:translateY(0px) scale(1);opacity:0;}20%{opacity:1;}50%{transform:translateY(-25px) scale(1.3);}100%{transform:translateY(-60px) scale(.7);opacity:0;}}
+
+    /* ── FOOTER ── */
+    .footer{margin-top:60px;padding:28px 0 16px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+    .footer-top{display:flex;align-items:center;justify-content:center;gap:30px;margin-bottom:16px;flex-wrap:wrap;}
+    .footer-link{color:#475569;font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+    .footer-link:hover{color:#00ff88;}
+    .footer-copy{font-size:12px;color:#334155;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes cardPop{from{opacity:0;transform:translateY(30px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+    /* ══════════════════════════════════
+       RESPONSIVE — ONLY THIS CHANGED
+       ══════════════════════════════════ */
+
+    /* ── TABLET (1024px) ── */
+    @media(max-width:1024px){
+      .main{padding:90px 20px 40px;}
+      .navbar{padding:0 24px;}
+
+      .overview-grid{grid-template-columns:repeat(2,1fr);}
+
+      .charts-row{grid-template-columns:1fr;}
+
+      .mid-row{grid-template-columns:1fr;}
+
+      .bottom-row{grid-template-columns:1fr 1fr;}
+
+      .page-header{flex-direction:column;align-items:flex-start;gap:14px;}
+      .filter-row{width:100%;flex-wrap:wrap;}
+      .filter-btn{flex:1;min-width:80px;text-align:center;}
+
+      .analytics-filters{flex-wrap:wrap;gap:10px;}
+    }
+
+    /* ── MOBILE (768px) ── */
+    @media(max-width:768px){
+      .main{padding:85px 14px 40px;}
+      .navbar{padding:0 16px;}
+      .nav-left img{width:90px;}
+      .create-nav-btn span{display:none;}
+      .create-nav-btn{padding:0 14px;gap:0;}
+      .analytics-nav-btn span{display:none;}
+      .analytics-nav-btn{padding:0 12px;}
+
+      .page-header-left h1{font-size:26px;}
+      .page-header-left h1 i{font-size:22px;}
+      .page-header-left p{font-size:13px;}
+
+      .overview-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+      .ov-num{font-size:34px;}
+      .ov-icon{width:38px;height:38px;font-size:16px;margin-bottom:12px;}
+
+      .charts-row{grid-template-columns:1fr;gap:12px;}
+      .bar-area{height:180px;}
+
+      .mid-row{grid-template-columns:1fr;gap:12px;}
+      .hm-cell{width:16px;height:16px;}
+
+      .bottom-row{grid-template-columns:1fr;gap:12px;}
+
+      .ptable{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+      .ptable thead{display:none;}
+      .ptable tr{display:block;margin-bottom:12px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);padding:12px;}
+      .ptable td{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+      .ptable td:last-child{border-bottom:none;}
+      .ptable td::before{content:attr(data-label);font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;margin-right:10px;}
+      .ptable .inline-bar{width:80px;}
+
+      .motivation-content{flex-direction:column;gap:20px;}
+      .quote-big-icon{width:70px;height:70px;}
+      .quote-big-icon i{font-size:22px;}
+      .mini-motivation-card{display:none;}
+      .quote-arrow-btn{width:40px;height:40px;font-size:14px;}
+      .quote-tag{font-size:12px;letter-spacing:2px;margin-bottom:24px;}
+      .quote-text-box{font-size:16px;}
+
+      .motivation-box{padding:16px 12px;}
+
+      .chart-header{flex-direction:column;align-items:flex-start;gap:10px;}
+      .tab-pills{flex-wrap:wrap;}
+
+      .streak-mini-grid{grid-template-columns:1fr 1fr;}
+
+      .notif-popup{width:calc(100vw - 24px);right:12px;top:76px;}
+      .profile-popup{width:calc(100vw - 24px);right:12px;top:76px;}
+    }
+
+    /* ── SMALL MOBILE (480px) ── */
+    @media(max-width:480px){
+      .main{padding:80px 12px 30px;}
+
+      .overview-grid{grid-template-columns:1fr 1fr;gap:10px;}
+      .ov-card{padding:16px;}
+      .ov-num{font-size:28px;}
+
+      .page-header-left h1{font-size:22px;gap:8px;}
+      .filter-btn{font-size:12px;padding:7px 12px;}
+
+      .chart-card{padding:16px;}
+      .chart-title{font-size:14px;}
+
+      .gp-item{flex-wrap:wrap;gap:8px;}
+      .gp-right{width:100%;}
+
+      .hm-cell{width:13px;height:13px;border-radius:3px;}
+      .hm-row{gap:3px;}
+      .heatmap-weeks{gap:3px;}
+
+      .streak-mini-card h3{font-size:16px;}
+      .streak-num h2{font-size:30px;}
+
+      .bottom-row{grid-template-columns:1fr;}
+
+      .table-card{padding:16px;}
+
+      .footer-top{gap:16px;}
+      .footer-link{font-size:11px;}
+
+      .notif-popup{width:calc(100vw - 16px);right:8px;}
+      .profile-popup{width:calc(100vw - 16px);right:8px;}
+    }
+  </style>
+
+</head>
+<body>
+
+<!-- ── SIDEBAR (exact from index.html) ── -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Picsart_26-05-19_08-40-08-746.png" onclick="window.location.href='dashboard.html'">
+  </div>
+  <div class="side-menu">
+    <div class="side-item" onclick="window.location.href='dashboard.html'">
+      <div class="side-icon"><i class="fa-solid fa-house"></i></div><span>Home</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-calendar-days"></i></div><span>Calendar</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-trophy"></i></div><span>Achievements</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='saved.html'">
+      <div class="side-icon"><i class="fa-solid fa-bookmark"></i></div><span>Saved</span>
+    </div>
+    <div class="side-item" onclick="window.location.href='index.html'">
+      <div class="side-icon"><i class="fa-solid fa-clock-rotate-left"></i></div><span>History</span>
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="side-motivation-box">
+      <div class="side-motivation-text">🔥 Stay Consistent</div>
+      <div class="side-motivation-quote" id="sideMotivationQuote">Small progress every day creates big results.</div>
+    </div>
+    <div class="side-logout-btn" onclick="showLogoutConfirm()">
+      <div class="side-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+      <span>Logout</span>
+    </div>
+  </div>
+</div>
+
+<div class="side-close-outside" onclick="toggleSidebar()">
+  <i class="fa-solid fa-xmark"></i>
+</div>
+<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+<!-- ── NAVBAR (exact from index.html) ── -->
+<div class="navbar">
+  <div class="nav-left">
+    
+    <img src="Picsart_26-05-19_08-40-08-746.png" onclick="window.location.href='dashboard.html'">
+  </div>
+  <div class="nav-right">
+    <button class="create-nav-btn" onclick="window.location.href='create.html'">
+      <i class="fa-solid fa-plus"></i> New Progress
+    </button>
+    <button class="analytics-nav-btn">
+      <i class="fa-solid fa-chart-line"></i> Analytics
+    </button>
+    <div class="notif-btn-wrap tooltip-btn" style="position:relative;">
+      <button class="nav-icon-btn" onclick="window.location.href='saved.html'">
+        <i class="fa-regular fa-floppy-disk"></i>
+      </button>
+      <span class="tooltip">Saved Progress</span>
+    </div>
+    <div class="notif-btn-wrap tooltip-btn" style="position:relative;">
+      <button class="nav-icon-btn" onclick="toggleNotifPopup(event)" id="notifBtn">
+        <i class="fa-regular fa-bell"></i>
+      </button>
+      <span class="notif-count" id="notifCount">0</span>
+      <span class="tooltip">Notifications</span>
+    </div>
+    <div class="notif-btn-wrap tooltip-btn" style="position:relative;">
+      <button class="nav-icon-btn" onclick="toggleProfilePopup(event)" id="profileBtn">
+        <i class="fa-solid fa-user" style="font-size:16px;"></i>
+      </button>
+      <span class="tooltip">Profile</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── NOTIFICATION POPUP ── -->
+<div id="notifPopup" class="notif-popup">
+  <div class="notif-header">
+    <h3><i class="fa-regular fa-bell" style="margin-right:8px;color:#00ff88;"></i>Notifications</h3>
+    <div class="notif-header-actions">
+      <span class="notif-mark-read-btn" onclick="markAllRead()"><i class="fa-solid fa-check-double" style="margin-right:4px;"></i>Mark all read</span>
+      <span class="notif-clear-btn" onclick="clearNotifications()">Clear All</span>
+    </div>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty"><i class="fa-regular fa-bell-slash"></i>No notifications yet</div>
+  </div>
+</div>
+
+<!-- ── PROFILE POPUP ── -->
+<div id="profilePopup" class="profile-popup">
+  <div class="profile-popup-top">
+    <div class="profile-popup-avatar" id="profilePopupAvatar"><i class="fa-solid fa-user"></i></div>
+    <div>
+      <div class="profile-popup-name" id="profileName">My Account</div>
+      <div class="profile-popup-email" id="profileEmail">progress@tracker.app</div>
+    </div>
+  </div>
+  <div class="profile-popup-menu">
+    <div class="profile-menu-item" onclick="closeProfilePopup();window.location.href='profile.html'">
+      <i class="fa-solid fa-user"></i> View your profile
+    </div>
+    <div class="profile-menu-item" onclick="closeProfilePopup();window.location.href='support.html'">
+      <i class="fa-regular fa-envelope"></i> Support
+    </div>
+    <div class="profile-menu-item" onclick="closeProfilePopup();window.location.href='feedback.html'">
+      <i class="fa-regular fa-comment-dots"></i> Feedback
+    </div>
+    <div class="profile-menu-item logout-item" onclick="closeProfilePopup();showLogoutConfirm()">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGOUT CONFIRM ── -->
+<div id="logoutConfirm" class="logout-confirm-overlay">
+  <div class="logout-confirm-modal">
+    <div class="logout-confirm-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+    <div class="logout-confirm-title">Logout?</div>
+    <div class="logout-confirm-desc">Are you sure you want to log out of Progress Tracker?</div>
+    <div class="logout-confirm-btns">
+      <button class="logout-cancel-btn" onclick="closeLogoutConfirm()">Cancel</button>
+      <button class="logout-ok-btn" onclick="confirmLogout()">Yes, Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
+      <p>Your overall progress insights &amp; performance overview</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn" onclick="setFilter(7,this)">7 Days</button>
+      <button class="filter-btn active" onclick="setFilter(30,this)">30 Days</button>
+      <button class="filter-btn" onclick="setFilter(90,this)">3 Months</button>
+      <button class="filter-btn" onclick="setFilter(0,this)">All Time</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW STAT CARDS -->
+  <div class="overview-grid" id="overviewGrid"></div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row" style="animation:fadeUp .7s .2s ease both;">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Completion Rate Over Time</div>
+          <div class="chart-sub">Daily completion % trend</div>
+        </div>
+        <div class="tab-pills">
+          <div class="tab-pill active" onclick="switchChart('line',this)">Line</div>
+          <div class="tab-pill" onclick="switchChart('bar',this)">Bar</div>
+        </div>
+      </div>
+      <div class="bar-area"><canvas id="mainChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Status Breakdown</div>
+          <div class="chart-sub">All progress goals</div>
+        </div>
+      </div>
+      <div class="donut-area">
+        <canvas id="donutChart"></canvas>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- MID ROW -->
+  <div class="mid-row" style="animation:fadeUp .7s .3s ease both;">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title"><i class="fa-solid fa-fire" style="color:#facc15;margin-right:8px;"></i>Consistency Heatmap</div>
+          <div class="chart-sub">Last 10 weeks activity</div>
+        </div>
+        <div style="font-size:12px;color:#475569;" id="heatmapMonth"></div>
+      </div>
+      <div>
+        <div class="heatmap-days" id="heatmapDays"></div>
+        <div class="heatmap-weeks" id="heatmapGrid"></div>
+        <div class="hm-legend-row">
+          <span class="hm-legend-label">Less</span>
+          <div class="hm-legend-cell hm-0"></div>
+          <div class="hm-legend-cell hm-2"></div>
+          <div class="hm-legend-cell hm-3"></div>
+          <div class="hm-legend-cell hm-4"></div>
+          <div class="hm-legend-cell hm-5"></div>
+          <span class="hm-legend-label">More</span>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title"><i class="fa-solid fa-bullseye" style="color:#3b82f6;margin-right:8px;"></i>Goal Progress</div>
+          <div class="chart-sub">Top active progress</div>
+        </div>
+      </div>
+      <div class="goal-progress-list" id="goalProgressList"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row" style="animation:fadeUp .7s .4s ease both;">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title"><i class="fa-solid fa-fire-flame-curved" style="color:#facc15;margin-right:8px;"></i>Streak</div>
+      </div>
+      <div class="streak-big">
+        <div class="streak-circle-wrap">
+          <canvas id="streakChart" width="130" height="130"></canvas>
+          <div class="streak-num">
+            <h2 id="streakNum">0</h2>
+            <p>Days</p>
+          </div>
+        </div>
+        <div class="streak-mini-grid" id="streakMiniGrid"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title"><i class="fa-solid fa-lightbulb" style="color:#facc15;margin-right:8px;"></i>Insights</div>
+      </div>
+      <div class="insight-list" id="insightList"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title"><i class="fa-solid fa-gauge" style="color:#00ff88;margin-right:8px;"></i>Consistency Meter</div>
+      </div>
+      <div class="meter-section" id="meterSection"></div>
+    </div>
+  </div>
+
+  <!-- ALL PROGRESS TABLE -->
+  <div class="table-card">
+    <div class="chart-header" style="margin-bottom:16px;">
+      <div>
+        <div class="chart-title"><i class="fa-solid fa-table-list" style="color:#a855f7;margin-right:8px;"></i>All Progress Details</div>
+        <div class="chart-sub">Full overview of every progress goal</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="tableSearch" placeholder="Search..." oninput="renderTable()" style="background:#0a0a0a;border:1px solid rgba(255,255,255,.08);color:white;padding:8px 14px;border-radius:10px;font-size:13px;outline:none;width:180px;">
+        <select id="tableFilter" onchange="renderTable()" style="background:#0a0a0a;border:1px solid rgba(255,255,255,.08);color:#94a3b8;padding:8px 14px;border-radius:10px;font-size:13px;outline:none;cursor:pointer;">
+          <option value="all">All Status</option>
+          <option value="Completed">Completed</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Incomplete">Incomplete</option>
+        </select>
+      </div>
+    </div>
+    <div id="progressTable"></div>
+  </div>
+
+  <!-- MOTIVATION BOX -->
+  <div class="motivation-section">
+    <div class="motivation-box">
+      <div class="motivation-bg"></div>
+      <div class="motivation-animated-bg">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <button class="quote-arrow-btn" onclick="prevMotivation()">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="motivation-center">
+        <div class="quote-tag">
+          <span></span>
+          <i class="fa-solid fa-quote-left"></i>
+          DAILY MOTIVATION
+          <i class="fa-solid fa-quote-right"></i>
+          <span></span>
+        </div>
+        <div class="motivation-content">
+          <div class="quote-big-icon">
+            <div class="quote-ring"></div>
+            <div class="quote-ring ring2"></div>
+            <i class="fa-solid fa-quote-left"></i>
+          </div>
+          <div class="quote-main">
+            <div class="quote-text-box" id="motivationText"></div>
+            <div class="quote-dots-wrap" id="motivationDots"></div>
+          </div>
+          <div class="mini-motivation-card">
+            <div class="mini-icon">⚡</div>
+            <div>
+              <h4>Stay Consistent</h4>
+              <p>You're building your future.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="quote-arrow-btn" onclick="nextMotivation()">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-top">
+      <a href="/support" class="footer-link"><i class="fa-regular fa-envelope"></i> Support</a>
+      <a href="/feedback" class="footer-link"><i class="fa-regular fa-comment-dots"></i> Feedback</a>
+      <a href="/termsandconditions" class="footer-link"><i class="fa-solid fa-file-lines"></i> Terms &amp; Conditions</a>
+    </div>
+    <div class="footer-copy">© Progress Tracker 2026 — All Rights Reserved</div>
+  </div>
+
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import {
+  collection, getDocs, query, orderBy,
+  doc, deleteDoc, setDoc, updateDoc, getDoc, addDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+/* ── HELPERS ── */
+function parseDate(s){let[y,m,d]=s.split("-");return new Date(y,m-1,d);}
+function getTotalDays(s,e){return Math.floor((parseDate(e)-parseDate(s))/(864e5))+1;}
+function getDateTimeStr(){let now=new Date();return now.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" · "+now.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});}
+function lockScroll(){document.body.style.overflow="hidden";}
+function unlockScroll(){document.body.style.overflow="";}
+
+/* ── STATE ── */
+let allProgress = [];
+let notifications = [];
+let filterDays = 30;
+let chartType = "line";
+let mainChartObj = null, donutChartObj = null, streakChartObj = null;
+let currentUserId = null;
+
+/* ══════════════════════════════════════
+   FIRESTORE — PROGRESS LOAD
+   ══════════════════════════════════════ */
+async function loadProgressFromFirestore(userId){
+  try{
+    const q = query(collection(db,"users",userId,"progress"), orderBy("createdAt","desc"));
+    const snap = await getDocs(q);
+    allProgress = [];
+    snap.forEach(d => allProgress.push({ firestoreId: d.id, ...d.data(), data: d.data().data||{} }));
+    renderAll();
+    await checkNotifications();
+  } catch(e){ console.error("Progress load error:",e); }
+}
+
+/* ══════════════════════════════════════
+   FIRESTORE — NOTIFICATIONS (same pattern)
+   ══════════════════════════════════════ */
+async function loadNotificationsFromFirestore(userId){
+  try{
+    const q = query(collection(db,"users",userId,"notifications"), orderBy("timestamp","desc"));
+    const snap = await getDocs(q);
+    notifications = [];
+    snap.forEach(d => notifications.push({ firestoreNotifId: d.id, ...d.data() }));
+    renderNotifications();
+  } catch(e){ console.error("Notif load error:",e); }
+}
+
+async function saveNotificationToFirestore(userId, notif){
+  try{
+    await addDoc(collection(db,"users",userId,"notifications"),{
+      ...notif, timestamp: serverTimestamp()
+    });
+  } catch(e){ console.error("Notif save error:",e); }
+}
+
+async function checkNotifications(){
+  if(!currentUserId) return;
+  let today=new Date();today.setHours(0,0,0,0);
+  let notifPrefs = {};
+  try{
+    const prefsDoc = await getDoc(doc(db,"users",currentUserId,"settings","notifPrefs"));
+    if(prefsDoc.exists()) notifPrefs = prefsDoc.data();
+  } catch(e){}
+  let alreadyNotified         = notifPrefs.notifiedStartIds      || [];
+  let alreadyCompNotified     = notifPrefs.notifiedCompleteIds   || [];
+  let alreadyDeadlineNotified = notifPrefs.notifiedDeadlineIds   || [];
+  let alreadyAchNotified      = notifPrefs.notifiedAchIds        || [];
+  let alreadyDayAlertNotified = notifPrefs.notifiedDayAlertIds   || [];
+  let newNotifs = [], changed = false;
+  let s = computeStats();
+  let achDefs=[
+    {id:"first_step",  title:"First Step 👟",        icon:"fa-shoe-prints",color:"#00ff88",bg:"rgba(0,255,136,.12)",  unlocked:s.total>=1},
+    {id:"streak7",     title:"7 Day Streak 🔥",       icon:"fa-fire",       color:"#facc15",bg:"rgba(250,204,21,.12)", unlocked:s.bestStreak>=7},
+    {id:"goal_crusher",title:"Goal Crusher 🏆",       icon:"fa-trophy",     color:"#3b82f6",bg:"rgba(59,130,246,.12)", unlocked:s.completed>=3},
+    {id:"streak30",    title:"Consistency Master 👑", icon:"fa-crown",      color:"#a855f7",bg:"rgba(168,85,247,.12)", unlocked:s.bestStreak>=30},
+    {id:"century",     title:"Century Club ⭐",        icon:"fa-star",       color:"#ef4444",bg:"rgba(239,68,68,.12)",  unlocked:s.totalCompletedDays>=100},
+    {id:"legend",      title:"Legend 💎",             icon:"fa-gem",        color:"#00ff88",bg:"rgba(0,255,136,.12)",  unlocked:s.completed>=3&&s.bestStreak>=30},
+  ];
+  achDefs.forEach(a=>{
+    if(a.unlocked&&!alreadyAchNotified.includes(a.id)){
+      newNotifs.push({id:Date.now()+Math.random(),title:"Achievement Unlocked! 🎉",desc:`You earned "${a.title}" — keep up the great work!`,time:getDateTimeStr(),icon:a.icon,color:a.color,bg:a.bg,read:false});
+      alreadyAchNotified.push(a.id);changed=true;
+    }
+  });
+  allProgress.forEach(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    let pct=Math.round((comp/td)*100)||0;
+    let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+    let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+    let fid=p.firestoreId;
+    if(start.getTime()===today.getTime()&&!alreadyNotified.includes(fid)){
+      newNotifs.push({id:Date.now()+Math.random(),title:"Progress Started! 🎯",desc:`Your progress "${p.name}" has started today!`,time:getDateTimeStr(),icon:"fa-rocket",color:"#00ff88",bg:"rgba(0,255,136,.12)",read:false});
+      alreadyNotified.push(fid);changed=true;
+    }
+    if(pct===100&&td>0&&!alreadyCompNotified.includes(fid)){
+      newNotifs.push({id:Date.now()+Math.random(),title:"Goal Completed! 🏆",desc:`Amazing! You completed "${p.name}" — 100% done!`,time:getDateTimeStr(),icon:"fa-trophy",color:"#facc15",bg:"rgba(250,204,21,.12)",read:false});
+      alreadyCompNotified.push(fid);changed=true;
+    }
+    let daysLeft=Math.floor((end-today)/864e5);
+    if(daysLeft>=0&&daysLeft<=3&&pct<100&&!alreadyDeadlineNotified.includes(fid)){
+      let urgency=daysLeft===0?"Today is the last day":`${daysLeft} day${daysLeft===1?"":"s"} left`;
+      newNotifs.push({id:Date.now()+Math.random(),title:"Deadline Soon! ⏰",desc:`"${p.name}" — ${urgency} to finish. You're at ${pct}%.`,time:getDateTimeStr(),icon:"fa-clock",color:"#f97316",bg:"rgba(249,115,22,.12)",read:false});
+      alreadyDeadlineNotified.push(fid);changed=true;
+    }
+    let isActiveToday=start<=today&&end>=today;
+    if(isActiveToday&&pct<100&&!alreadyDayAlertNotified.includes(fid)){
+      let todayDayNum=Math.floor((today-start)/864e5)+1;
+      if(!p.data?.[todayDayNum]||p.data[todayDayNum]?.status!=="complete"){
+        newNotifs.push({id:Date.now()+Math.random(),title:"Don't Break the Streak! ⚡",desc:`You haven't marked today's progress for "${p.name}". Keep going!`,time:getDateTimeStr(),icon:"fa-triangle-exclamation",color:"#f97316",bg:"rgba(249,115,22,.1)",read:false});
+        alreadyDayAlertNotified.push(fid);changed=true;
+      }
+    }
+  });
+  for(const notif of newNotifs){
+    await saveNotificationToFirestore(currentUserId, notif);
+  }
+  if(changed){
+    try{
+      await setDoc(doc(db,"users",currentUserId,"settings","notifPrefs"),{
+        notifiedStartIds:    alreadyNotified,
+        notifiedCompleteIds: alreadyCompNotified,
+        notifiedDeadlineIds: alreadyDeadlineNotified,
+        notifiedAchIds:      alreadyAchNotified,
+        notifiedDayAlertIds: alreadyDayAlertNotified,
+      },{merge:true});
+    } catch(e){ console.error("NotifPrefs save error:",e); }
+  }
+  await loadNotificationsFromFirestore(currentUserId);
+}
+
+function renderNotifications(){
+  let list=document.getElementById("notifList");
+  let countEl=document.getElementById("notifCount");
+  let unread=notifications.filter(n=>!n.read).length;
+  if(unread>0){countEl.innerText=unread>9?"9+":unread;countEl.classList.add("show");}
+  else countEl.classList.remove("show");
+  if(notifications.length===0){list.innerHTML=`<div class="notif-empty"><i class="fa-regular fa-bell-slash"></i>No notifications yet</div>`;return;}
+  list.innerHTML=notifications.map(n=>`
+    <div class="notif-item${!n.read?" unread":""}">
+      <div class="notif-icon" style="background:${n.bg};color:${n.color};"><i class="fa-solid ${n.icon}"></i></div>
+      <div class="notif-text">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>`).join("");
+}
+
+async function markAllRead(){
+  if(!currentUserId) return;
+  try{
+    const snap = await getDocs(collection(db,"users",currentUserId,"notifications"));
+    await Promise.all(snap.docs.map(d => updateDoc(doc(db,"users",currentUserId,"notifications",d.id),{read:true})));
+    await loadNotificationsFromFirestore(currentUserId);
+  } catch(e){ console.error("markAllRead error:",e); }
+}
+
+async function toggleNotifPopup(e){
+  e.stopPropagation();
+  let popup=document.getElementById("notifPopup");
+  document.getElementById("profilePopup").classList.remove("show");
+  popup.classList.toggle("show");
+  if(popup.classList.contains("show")&&currentUserId) await markAllRead();
+}
+
+async function clearNotifications(){
+  if(!currentUserId) return;
+  try{
+    const snap = await getDocs(collection(db,"users",currentUserId,"notifications"));
+    await Promise.all(snap.docs.map(d => deleteDoc(doc(db,"users",currentUserId,"notifications",d.id))));
+    notifications=[];
+    renderNotifications();
+    document.getElementById("notifPopup").classList.remove("show");
+  } catch(e){ console.error("clearNotifications error:",e); }
+}
+
+/* ── SIDEBAR ── */
+function toggleSidebar(){
+  let s=document.getElementById("sidebar"),o=document.getElementById("overlay");
+  s.classList.toggle("open");o.classList.toggle("show");
+  if(s.classList.contains("open")) lockScroll(); else unlockScroll();
+}
+const sideQuotes=["Small progress every day creates big results.","Stay consistent and never give up.","Discipline today leads to success tomorrow.","Focus on progress, not perfection.","Your future is created by what you do today."];
+let sideQIdx=0;
+function rotateSideQuote(){
+  sideQIdx=(sideQIdx+1)%sideQuotes.length;
+  let el=document.getElementById("sideMotivationQuote");
+  if(el){el.style.opacity="0";setTimeout(()=>{el.innerText=sideQuotes[sideQIdx];el.style.opacity="1";},300);}
+}
+setInterval(rotateSideQuote,5000);
+
+/* ── LOGOUT ── */
+function showLogoutConfirm(){document.getElementById("logoutConfirm").classList.add("show");lockScroll();}
+function closeLogoutConfirm(){document.getElementById("logoutConfirm").classList.remove("show");unlockScroll();}
+function confirmLogout(){
+  signOut(auth).finally(()=>{localStorage.removeItem("loggedIn");window.location.href="login.html";});
+}
+
+/* ── PROFILE POPUP ── */
+function toggleProfilePopup(e){
+  e.stopPropagation();
+  let popup=document.getElementById("profilePopup");
+  document.getElementById("notifPopup").classList.remove("show");
+  popup.classList.toggle("show");
+}
+function closeProfilePopup(){document.getElementById("profilePopup").classList.remove("show");}
+document.addEventListener("click",function(e){
+  let pp=document.getElementById("profilePopup"),pb=document.getElementById("profileBtn");
+  if(pp&&!pp.contains(e.target)&&pb&&!pb.contains(e.target)) pp.classList.remove("show");
+  let np=document.getElementById("notifPopup"),nb=document.getElementById("notifBtn");
+  if(np&&!np.contains(e.target)&&nb&&!nb.contains(e.target)) np.classList.remove("show");
+});
+
+/* ── FILTER ── */
+function setFilter(days,btn){
+  filterDays=days;
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderAll();
+}
+function switchChart(type,btn){
+  chartType=type;
+  document.querySelectorAll(".tab-pill").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderMainChart();
+}
+
+/* ── COMPUTE STATS ── */
+function computeStats(){
+  let today=new Date();today.setHours(0,0,0,0);
+  let total=allProgress.length,completed=0,active=0,totalCompletedDays=0,totalDaysAll=0;
+  let currentStreak=0,bestStreak=0,tempStreak=0;
+  allProgress.forEach(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    totalCompletedDays+=comp;totalDaysAll+=td;
+    let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+    let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+    let pct=Math.round((comp/td)*100)||0;
+    if(pct===100) completed++;
+    else if(today>=start&&today<=end) active++;
+    tempStreak=0;
+    for(let i=1;i<=td;i++){
+      if(p.data?.[i]?.status==="complete"){tempStreak++;bestStreak=Math.max(bestStreak,tempStreak);}
+      else tempStreak=0;
+    }
+    let cs=0;
+    for(let i=td;i>=1;i--){
+      if(p.data?.[i]?.status==="complete") cs++;
+      else if(p.data?.[i]?.status==="incomplete") break;
+    }
+    currentStreak=Math.max(currentStreak,cs);
+  });
+  let overallPct=totalDaysAll>0?Math.round((totalCompletedDays/totalDaysAll)*100):0;
+  return{total,completed,active,totalCompletedDays,overallPct,currentStreak,bestStreak};
+}
+
+/* ── OVERVIEW CARDS ── */
+function renderOverview(){
+  let{total,completed,active,currentStreak,bestStreak}=computeStats();
+  let el=document.getElementById("overviewGrid");
+  if(!el) return;
+  el.innerHTML=[
+    {cls:"blue", icon:"fa-chart-line",         num:total,         label:"Total Progress",    badge:`${completed} completed`,                         badgeIcon:"fa-arrow-up"},
+    {cls:"green",icon:"fa-circle-check",        num:completed,     label:"Completed Goals",   badge:`${Math.round((completed/Math.max(total,1))*100)}% success rate`, badgeIcon:"fa-check"},
+    {cls:"purple",icon:"fa-clock",             num:active,        label:"Active Progress",   badge:`${total-completed-active} not started`,           badgeIcon:"fa-hourglass"},
+    {cls:"amber",icon:"fa-fire-flame-curved",  num:currentStreak, label:"Current Streak",    badge:`Best: ${bestStreak} days`,                       badgeIcon:"fa-trophy"},
+  ].map(c=>`
+    <div class="ov-card ${c.cls}">
+      <div class="ov-icon"><i class="fa-solid ${c.icon}"></i></div>
+      <div class="ov-num">${c.num}</div>
+      <div class="ov-label">${c.label}</div>
+      <div class="ov-badge"><i class="fa-solid ${c.badgeIcon}" style="font-size:10px;"></i>${c.badge}</div>
+    </div>`).join("");
+}
+
+/* ── MAIN CHART ── */
+function renderMainChart(){
+  let today=new Date();today.setHours(0,0,0,0);
+  let days=filterDays===0?60:filterDays;
+  let labels=[],values=[],completedArr=[],incompleteArr=[];
+  for(let i=days-1;i>=0;i--){
+    let d=new Date(today);d.setDate(d.getDate()-i);
+    labels.push(d.toLocaleDateString("en-US",{month:"short",day:"numeric"}));
+    let dc=0,dt=0;
+    allProgress.forEach(p=>{
+      let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+      let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+      if(d>=start&&d<=end){
+        dt++;
+        let diff=Math.floor((d-start)/864e5)+1;
+        if(p.data?.[diff]?.status==="complete") dc++;
+      }
+    });
+    values.push(dt>0?Math.round((dc/dt)*100):0);
+    completedArr.push(dc);
+    incompleteArr.push(dt-dc);
+  }
+  let ctx=document.getElementById("mainChart");
+  if(!ctx) return;
+  if(mainChartObj) mainChartObj.destroy();
+  let skip=days>30?7:days>14?3:1;
+  let displayLabels=labels.map((l,i)=>i%skip===0?l:"");
+  let datasets=chartType==="line"?[{
+    data:values,borderColor:"#00ff88",
+    backgroundColor:(c2)=>{
+      let ch=c2.chart,{ctx:cx,chartArea:ca}=ch;if(!ca)return;
+      let g=cx.createLinearGradient(0,ca.top,0,ca.bottom);
+      g.addColorStop(0,"rgba(0,255,136,.18)");g.addColorStop(1,"rgba(0,255,136,0)");return g;
+    },
+    fill:true,tension:.42,borderWidth:3,pointRadius:3,
+    pointBackgroundColor:"#00ff88",pointBorderColor:"#050505",pointBorderWidth:2,
+    segment:{borderColor:c2=>c2.p1.parsed.y<c2.p0.parsed.y?"#ef4444":"#00ff88"}
+  }]:[
+    {label:"Completed",data:completedArr,backgroundColor:"rgba(0,255,136,.7)",borderRadius:4},
+    {label:"Incomplete",data:incompleteArr,backgroundColor:"rgba(239,68,68,.5)",borderRadius:4}
+  ];
+  mainChartObj=new Chart(ctx,{
+    type:chartType==="line"?"line":"bar",
+    data:{labels:displayLabels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:chartType!=="line",labels:{color:"#64748b",font:{size:12}}}},
+      scales:{
+        x:{ticks:{color:"#334155",font:{size:11}},grid:{color:"rgba(255,255,255,.03)"}},
+        y:{min:0,max:chartType==="line"?100:undefined,
+          ticks:{color:"#334155",font:{size:11},callback:v=>chartType==="line"?v+"%":v},
+          grid:{color:"rgba(255,255,255,.04)"}}
+      }
+    }
+  });
+}
+
+/* ── DONUT ── */
+function renderDonut(){
+  let today=new Date();today.setHours(0,0,0,0);
+  let comp=0,active=0,incomplete=0;
+  allProgress.forEach(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let c=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    let pct=Math.round((c/td)*100)||0;
+    let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+    let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+    if(pct===100) comp++;
+    else if(today>=start&&today<=end) active++;
+    else incomplete++;
+  });
+  let total=allProgress.length||1;
+  let ctx=document.getElementById("donutChart");
+  if(!ctx) return;
+  if(donutChartObj) donutChartObj.destroy();
+  donutChartObj=new Chart(ctx,{
+    type:"doughnut",
+    data:{labels:["Completed","Active","Incomplete"],datasets:[{
+      data:[comp,active,incomplete],
+      backgroundColor:["#00ff88","#a855f7","#ef4444"],
+      borderColor:"#050505",borderWidth:3,hoverOffset:8
+    }]},
+    options:{responsive:false,cutout:"68%",plugins:{legend:{display:false}}}
+  });
+  let legendEl=document.getElementById("donutLegend");
+  if(legendEl) legendEl.innerHTML=[
+    {dot:"#00ff88",label:"Completed",val:comp},
+    {dot:"#a855f7",label:"Active",val:active},
+    {dot:"#ef4444",label:"Incomplete",val:incomplete}
+  ].map(r=>`
+    <div class="legend-row">
+      <div class="legend-left"><div class="legend-dot" style="background:${r.dot};"></div>${r.label}</div>
+      <div class="legend-val">${r.val} <span style="font-size:11px;color:#334155;">(${Math.round((r.val/total)*100)}%)</span></div>
+    </div>`).join("");
+}
+
+/* ── HEATMAP ── */
+function renderHeatmap(){
+  let today=new Date();today.setHours(0,0,0,0);
+  let weeks=10;
+  let days=["S","M","T","W","T","F","S"];
+  let daysEl=document.getElementById("heatmapDays");
+  if(daysEl) daysEl.innerHTML=days.map(d=>`<span class="hm-day-label">${d}</span>`).join("");
+  let monthEl=document.getElementById("heatmapMonth");
+  if(monthEl) monthEl.innerText=today.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+  let grid=document.getElementById("heatmapGrid");
+  if(!grid) return;
+  let rows=[];
+  for(let w=weeks-1;w>=0;w--){
+    let cells=[];
+    for(let d=0;d<7;d++){
+      let date=new Date(today);date.setDate(date.getDate()-((w*7)+(6-d)));date.setHours(0,0,0,0);
+      let score=0;
+      allProgress.forEach(p=>{
+        let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+        let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+        if(date>=start&&date<=end){
+          let diff=Math.floor((date-start)/864e5)+1;
+          if(p.data?.[diff]?.status==="complete") score++;
+        }
+      });
+      let cls=score===0?"hm-0":score===1?"hm-1":score===2?"hm-2":score===3?"hm-3":score===4?"hm-4":"hm-5";
+      cells.push(`<div class="hm-cell ${cls}" title="${date.toDateString()}: ${score} goals"></div>`);
+    }
+    rows.push(`<div class="hm-row">${cells.join("")}</div>`);
+  }
+  grid.innerHTML=rows.join("");
+}
+
+/* ── GOAL PROGRESS LIST ── */
+function renderGoalList(){
+  let items=allProgress.map(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    let pct=Math.round((comp/td)*100)||0;
+    return{name:p.name,firestoreId:p.firestoreId,pct,comp,td};
+  }).sort((a,b)=>b.pct-a.pct).slice(0,5);
+  let colors=["#3b82f6","#00ff88","#a855f7","#facc15","#ef4444"];
+  let icons=["fa-gamepad","fa-book","fa-dumbbell","fa-droplet","fa-brain"];
+  let bgs=["rgba(59,130,246,.12)","rgba(0,255,136,.10)","rgba(168,85,247,.12)","rgba(250,204,21,.10)","rgba(239,68,68,.12)"];
+  let el=document.getElementById("goalProgressList");
+  if(!el) return;
+  if(items.length===0){
+    el.innerHTML=`<div style="text-align:center;padding:30px;color:#334155;font-size:14px;">No progress found. <a href="create.html" style="color:#00ff88;">Create a Progress</a></div>`;
+    return;
+  }
+  el.innerHTML=items.map((it,i)=>`
+    <div class="gp-item" onclick="window.location.href='tracker.html?id=${it.firestoreId}'" style="cursor:pointer;">
+      <div class="gp-icon" style="background:${bgs[i%5]};color:${colors[i%5]};"><i class="fa-solid ${icons[i%5]}"></i></div>
+      <div class="gp-info"><div class="gp-name">${it.name}</div><div class="gp-meta">${it.comp} of ${it.td} days done</div></div>
+      <div class="gp-right">
+        <div class="gp-bar-bg"><div class="gp-bar-fill" style="width:${it.pct}%;background:${colors[i%5]};box-shadow:0 0 8px ${colors[i%5]};"></div></div>
+        <div class="gp-pct">${it.pct}%</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ── STREAK ── */
+function renderStreak(){
+  let{currentStreak,bestStreak,overallPct}=computeStats();
+  let numEl=document.getElementById("streakNum");
+  if(numEl) numEl.innerText=currentStreak;
+  let ctx=document.getElementById("streakChart");
+  if(!ctx) return;
+  if(streakChartObj) streakChartObj.destroy();
+  let pct=Math.min((currentStreak/Math.max(bestStreak,1))*100,100);
+  streakChartObj=new Chart(ctx,{
+    type:"doughnut",
+    data:{datasets:[{data:[pct,100-pct],backgroundColor:["#facc15","rgba(255,255,255,.04)"],borderColor:"transparent",borderWidth:0}]},
+    options:{responsive:false,cutout:"75%",plugins:{legend:{display:false}},animation:{duration:1200}}
+  });
+  let miniEl=document.getElementById("streakMiniGrid");
+  if(miniEl) miniEl.innerHTML=`
+    <div class="streak-mini-card"><p>Best Streak</p><h3 style="color:#facc15;">${bestStreak}<span style="font-size:12px;color:#64748b;"> days</span></h3></div>
+    <div class="streak-mini-card"><p>Consistency</p><h3 style="color:#00ff88;">${overallPct}%</h3></div>`;
+}
+
+/* ── INSIGHTS ── */
+function renderInsights(){
+  let{overallPct,currentStreak,completed,total}=computeStats();
+  let ins=[];
+  if(currentStreak>=3) ins.push({e:"🔥",h:`${currentStreak}-Day Streak!`,b:"You're on fire! Keep the momentum going strong."});
+  else ins.push({e:"⚡",h:"Start a streak",b:"Complete today's goals to start building your streak."});
+  if(overallPct>=75) ins.push({e:"🏆",h:"Excellent consistency",b:`Your ${overallPct}% completion rate is outstanding. Keep it up!`});
+  else if(overallPct>=50) ins.push({e:"📈",h:"Good progress",b:`${overallPct}% overall — you're improving. Aim for 75%+!`});
+  else ins.push({e:"⚠️",h:"Needs improvement",b:`Your completion rate is ${overallPct}%. Try setting smaller daily goals.`});
+  if(completed>0) ins.push({e:"✅",h:`${completed} Goal${completed>1?"s":""} Completed!`,b:"Great job finishing what you started. Celebrate the wins!"});
+  else ins.push({e:"🎯",h:"Complete your first goal",b:"Finish all days of a progress tracker to unlock your first completion!"});
+  let el=document.getElementById("insightList");
+  if(el) el.innerHTML=ins.slice(0,3).map(it=>`
+    <div class="insight-item">
+      <div class="insight-emoji">${it.e}</div>
+      <div><div class="insight-head">${it.h}</div><div class="insight-body">${it.b}</div></div>
+    </div>`).join("");
+}
+
+/* ── METERS ── */
+function renderMeters(){
+  let{overallPct,completed,total,currentStreak}=computeStats();
+  let meters=[
+    {label:"Completion Rate",pct:overallPct,color:"#00ff88"},
+    {label:"Goals Finished",pct:Math.round((completed/Math.max(total,1))*100),color:"#3b82f6"},
+    {label:"Streak Health",pct:Math.min(currentStreak*10,100),color:"#facc15"},
+  ];
+  let el=document.getElementById("meterSection");
+  if(!el) return;
+  el.innerHTML=`
+    <div class="radial-wrap">
+      <div style="width:100px;height:100px;border-radius:50%;background:conic-gradient(#00ff88 ${overallPct*3.6}deg,rgba(255,255,255,.06) 0);display:flex;align-items:center;justify-content:center;">
+        <div class="radial-inner"><h2 style="font-size:18px;color:#00ff88;font-weight:700;margin:0;">${overallPct}%</h2><p style="font-size:10px;color:#475569;">Overall</p></div>
+      </div>
+      <p style="font-size:13px;color:#64748b;margin-top:6px;">${overallPct>=75?"Excellent 🔥":overallPct>=50?"Good 👍":overallPct>=25?"Average 📊":"Needs Work ⚠️"}</p>
+    </div>
+    ${meters.map(m=>`
+      <div class="meter-card">
+        <div class="meter-label"><span>${m.label}</span><span>${m.pct}%</span></div>
+        <div class="meter-bg"><div class="meter-fill" style="width:${m.pct}%;background:${m.color};box-shadow:0 0 10px ${m.color};"></div></div>
+      </div>`).join("")}`;
+}
+
+/* ── TABLE ── */
+function renderTable(){
+  let search=(document.getElementById("tableSearch")?.value||"").toLowerCase();
+  let filterVal=document.getElementById("tableFilter")?.value||"all";
+  let today=new Date();today.setHours(0,0,0,0);
+  let rows=allProgress.map(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    let pct=Math.round((comp/td)*100)||0;
+    let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+    let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+    let status=pct===100?"Completed":today>=start&&today<=end?"In Progress":"Incomplete";
+    return{...p,td,comp,pct,status};
+  }).filter(p=>{
+    if(search&&!p.name.toLowerCase().includes(search)) return false;
+    if(filterVal!=="all"&&p.status!==filterVal) return false;
+    return true;
+  });
+  let chipClass={Completed:"chip-complete","In Progress":"chip-progress",Incomplete:"chip-incomplete"};
+  let barColor={Completed:"#22c55e","In Progress":"#facc15",Incomplete:"#ef4444"};
+  let el=document.getElementById("progressTable");
+  if(!el) return;
+  if(rows.length===0){
+    el.innerHTML=`<div class="empty-state"><i class="fa-regular fa-folder-open"></i><h2>No progress found</h2><p>Try adjusting your search or filter. <a href="create.html">Create a new progress</a></p></div>`;
+    return;
+  }
+  el.innerHTML=`
+    <table class="ptable">
+      <thead><tr><th>#</th><th>Progress Name</th><th>Duration</th><th>Progress</th><th>Status</th><th>Completed</th><th>Action</th></tr></thead>
+      <tbody>
+        ${rows.map((p,i)=>`
+          <tr>
+            <td style="color:#334155;">${i+1}</td>
+            <td><div class="prog-name">${p.name}</div><div style="font-size:11px;color:#334155;margin-top:2px;">${p.startDate} → ${p.endDate}</div></td>
+            <td>${p.td} Days</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="inline-bar"><div class="inline-fill" style="width:${p.pct}%;background:${barColor[p.status]};"></div></div>
+                <span style="font-size:12px;font-weight:600;color:${barColor[p.status]};">${p.pct}%</span>
+              </div>
+            </td>
+            <td><span class="status-chip ${chipClass[p.status]}">${p.status}</span></td>
+            <td>${p.comp}/${p.td}</td>
+            <td><a class="open-link" onclick="window.location.href='tracker.html?id=${p.firestoreId}'" style="cursor:pointer;"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:4px;"></i>Open</a></td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ── MOTIVATION ── */
+const motivationQuotes=[
+  "Discipline today <span>leads to success</span> tomorrow.",
+  "Small progress every day creates <span>big results</span>.",
+  "Stay consistent and never <span>give up</span>.",
+  "Focus on progress, not <span>perfection</span>.",
+  "Your future is created by what you do <span>today</span>.",
+  "Track it. <span>Own it.</span> Achieve it.",
+  "Every expert was once <span>a beginner</span>. Keep going.",
+  "Consistency is the <span>key to mastery</span>.",
+  "Success is the sum of <span>small efforts</span> repeated daily.",
+  "You don't have to be great to start, but <span>start to be great</span>.",
+];
+let mIdx=0,mTimer=null;
+function renderMotivation(){
+  let el=document.getElementById("motivationText"),dotsEl=document.getElementById("motivationDots");
+  if(!el||!dotsEl) return;
+  el.style.opacity="0";el.style.transform="translateX(30px)";
+  setTimeout(()=>{el.innerHTML=motivationQuotes[mIdx];el.style.opacity="1";el.style.transform="translateX(0)";},350);
+  dotsEl.innerHTML=motivationQuotes.map((_,i)=>`<div class="quote-dot${i===mIdx?" active":""}" onclick="goMotivation(${i})"></div>`).join("");
+}
+function nextMotivation(){mIdx=(mIdx+1)%motivationQuotes.length;renderMotivation();resetMotivationTimer();}
+function prevMotivation(){mIdx=(mIdx-1+motivationQuotes.length)%motivationQuotes.length;renderMotivation();resetMotivationTimer();}
+function goMotivation(i){mIdx=i;renderMotivation();resetMotivationTimer();}
+function resetMotivationTimer(){if(mTimer)clearInterval(mTimer);mTimer=setInterval(nextMotivation,3000);}
+
+/* ── RENDER ALL ── */
+function renderAll(){
+  renderOverview();
+  renderMainChart();
+  renderDonut();
+  renderHeatmap();
+  renderGoalList();
+  renderStreak();
+  renderInsights();
+  renderMeters();
+  renderTable();
+}
+
+/* ── AUTH GUARD + INIT ── */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){window.location.href="login.html";return;}
+  currentUserId=user.uid;
+  /* Load profile name */
+   try{
+    const profDoc = await getDoc(doc(db, "users", user.uid));
+    if(profDoc.exists()){
+      let pd = profDoc.data();
+      let nameEl  = document.getElementById("profileName");
+      let emailEl = document.getElementById("profileEmail");
+      if(nameEl)  nameEl.innerText  = pd.name  || "My Account";
+      if(emailEl) emailEl.innerText = user.email || "progress@tracker.app";
+            let avatarEl = document.getElementById("profilePopupAvatar");
+
+if(
+   avatarEl &&
+   pd.avatarType === "image" &&
+   pd.avatarImg
+){
+   avatarEl.innerHTML = `
+      <img
+         src="${pd.avatarImg}"
+         alt="Profile"
+         style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:50%;
+         "
+      >
+   `;
+}
+    }
+  } catch(e){ console.error(e); }
+  await loadProgressFromFirestore(user.uid);
+  renderMotivation();
+  resetMotivationTimer();
+});
+
+/* ── EXPOSE TO HTML onclick ── */
+window.toggleSidebar     = toggleSidebar;
+window.toggleProfilePopup= toggleProfilePopup;
+window.closeProfilePopup = closeProfilePopup;
+window.toggleNotifPopup  = toggleNotifPopup;
+window.markAllRead       = markAllRead;
+window.clearNotifications= clearNotifications;
+window.showLogoutConfirm = showLogoutConfirm;
+window.closeLogoutConfirm= closeLogoutConfirm;
+window.confirmLogout     = confirmLogout;
+window.setFilter         = setFilter;
+window.switchChart       = switchChart;
+window.renderTable       = renderTable;
+window.nextMotivation    = nextMotivation;
+window.prevMotivation    = prevMotivation;
+window.goMotivation      = goMotivation;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Progress Tracker</title>
+<link rel="icon" type="png" href="main icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>/*if(localStorage.getItem("loggedIn")!=="true"){window.location.href="login.html";}*/</script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#050505;color:white;overflow-x:hidden;}
+
+/* NAVBAR */
+.navbar{width:100%;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 50px;background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(18px);position:fixed;top:0;z-index:1000;}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.nav-left img{width:120px;height:auto;cursor:pointer;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.create-nav-btn{display:flex;align-items:center;gap:10px;padding:0 20px;height:40px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:13px;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:.3s;box-shadow:0 0 20px rgba(0,255,136,.25);font-family:'Poppins',sans-serif;}
+.create-nav-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,136,.4);}
+.analytics-nav-btn{display:flex;align-items:center;gap:8px;padding:0 18px;height:40px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:13px;font-weight:500;border-radius:12px;cursor:pointer;transition:.25s;}
+.analytics-nav-btn:hover{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,.06);}
+.nav-icon-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;transition:.25s;font-size:16px;}
+.nav-icon-btn:hover{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:#00ff88;}
+.menu-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.25s;border:1px solid rgba(255,255,255,.08);}
+.menu-icon i{font-size:18px;color:white;}
+.menu-icon:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18);}
+.tooltip-btn{position:relative;}
+.tooltip{position:absolute;top:58px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:6px 14px;border-radius:10px;font-size:13px;font-weight:500;border:1px solid #2a2a2a;white-space:nowrap;opacity:0;visibility:hidden;transition:0.25s ease;z-index:999;}
+.tooltip-btn:hover .tooltip{opacity:1;visibility:visible;top:65px;}
+.tooltip::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:#111;border-left:1px solid #2a2a2a;border-top:1px solid #2a2a2a;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:-240px;width:240px;height:100vh;background:rgba(5,5,5,0.97);border-right:1px solid rgba(255,255,255,.06);z-index:99999;transition:.35s ease;display:flex;flex-direction:column;backdrop-filter:blur(20px);}
+.sidebar.open{left:0;}
+.sidebar-logo{display:flex;align-items:center;justify-content:center;padding:24px 20px 10px;border-bottom:1px solid rgba(255,255,255,.04);}
+.sidebar-logo img{width:130px;height:auto;}
+.side-menu{padding:14px 10px;overflow-y:auto;flex:1;}
+.side-item{width:100%;height:50px;display:flex;align-items:center;gap:12px;padding:0 14px;margin-bottom:6px;border-radius:14px;cursor:pointer;transition:.25s;color:#94a3b8;}
+.side-item.active{background:linear-gradient(90deg,rgba(0,255,136,.1),rgba(0,255,136,.04));border:1px solid rgba(0,255,136,.15);color:white;box-shadow:inset 3px 0 0 #00ff88;}
+.side-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);font-size:14px;color:#64748b;flex-shrink:0;transition:.25s;}
+.side-item.active .side-icon{background:rgba(0,255,136,.12);color:#00ff88;}
+.side-item:hover{background:rgba(255,255,255,.04);color:white;transform:translateX(3px);}
+.side-item:hover .side-icon{background:rgba(0,255,136,.08);color:#00ff88;}
+.side-item span{font-size:14px;font-weight:500;}
+.sidebar-bottom{padding:10px;border-top:1px solid rgba(255,255,255,.04);}
+.side-motivation-box{padding:14px;border-radius:14px;background:linear-gradient(145deg,rgba(255,170,0,.07),rgba(255,140,0,.03));border:1px solid rgba(255,170,0,.15);margin-bottom:10px;position:relative;overflow:hidden;}
+.side-motivation-box::before{content:'';position:absolute;width:80px;height:80px;top:-30px;right:-20px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,0,.15),transparent 70%);pointer-events:none;}
+.side-motivation-text{font-size:11px;color:#f59e0b;font-weight:500;line-height:1.5;margin-bottom:8px;}
+.side-motivation-quote{font-size:10px;color:#78716c;font-style:italic;line-height:1.4;transition:opacity .3s;}
+.side-logout-btn{width:100%;height:44px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:14px;cursor:pointer;transition:.25s;color:#ef4444;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.12);}
+.side-logout-btn:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);}
+.side-logout-btn .side-icon{background:rgba(239,68,68,.1);color:#ef4444;}
+.side-logout-btn span{font-size:14px;font-weight:500;}
+.side-close-outside{position:fixed;top:24px;left:190px;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.9);border:1px solid rgba(255,255,255,.12);color:white;font-size:22px;cursor:pointer;z-index:100000;backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:left .35s ease,opacity .25s ease;}
+.sidebar.open ~ .side-close-outside{left:250px;opacity:1;visibility:visible;}
+.side-close-outside:hover{border:1px solid rgba(255,255,255,.24);background:rgba(30,29,29,.82);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.3s ease;z-index:1500;}
+.overlay.show{opacity:1;visibility:visible;}
+
+/* MAIN */
+.main{max-width:1100px;margin:auto;padding:90px 30px 60px;}
+
+/* PROFILE HERO */
+.profile-hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(145deg,rgba(6,8,18,.98),rgba(4,6,14,.98));border:1px solid rgba(255,255,255,.07);margin-bottom:24px;}
+.profile-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(0,255,136,.06),transparent 50%),radial-gradient(ellipse at bottom right,rgba(59,130,246,.05),transparent 50%);pointer-events:none;}
+
+.profile-hero-banner{height:160px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.05);}
+.profile-hero-banner.morning{background:linear-gradient(135deg,rgba(255,180,50,.13) 0%,rgba(255,120,20,.09) 30%,rgba(255,200,80,.07) 60%,rgba(59,130,246,.05) 100%);}
+.profile-hero-banner.afternoon{background:linear-gradient(135deg,rgba(59,130,246,.12) 0%,rgba(0,255,136,.08) 40%,rgba(99,210,255,.07) 70%,rgba(168,85,247,.05) 100%);}
+.profile-hero-banner.evening{background:linear-gradient(135deg,rgba(168,85,247,.14) 0%,rgba(239,68,68,.08) 35%,rgba(249,115,22,.1) 65%,rgba(59,130,246,.06) 100%);}
+.profile-hero-banner.night{background:linear-gradient(135deg,rgba(30,20,80,.6) 0%,rgba(59,130,246,.1) 35%,rgba(0,255,136,.06) 70%,rgba(168,85,247,.08) 100%);}
+.banner-mesh{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+.banner-orb{position:absolute;border-radius:50%;pointer-events:none;animation:orbFloat 8s ease-in-out infinite;}
+.banner-orb-1{width:220px;height:220px;top:-80px;left:-40px;animation-duration:9s;}
+.banner-orb-2{width:160px;height:160px;bottom:-70px;right:60px;animation-duration:7s;animation-delay:-3s;}
+.banner-orb-3{width:100px;height:100px;top:20px;right:200px;animation-duration:11s;animation-delay:-6s;}
+.profile-hero-banner.morning .banner-orb-1{background:radial-gradient(circle,rgba(255,170,50,.22),transparent 70%);}
+.profile-hero-banner.morning .banner-orb-2{background:radial-gradient(circle,rgba(255,120,20,.16),transparent 70%);}
+.profile-hero-banner.morning .banner-orb-3{background:radial-gradient(circle,rgba(255,220,100,.12),transparent 70%);}
+.profile-hero-banner.afternoon .banner-orb-1{background:radial-gradient(circle,rgba(0,255,136,.18),transparent 70%);}
+.profile-hero-banner.afternoon .banner-orb-2{background:radial-gradient(circle,rgba(59,130,246,.14),transparent 70%);}
+.profile-hero-banner.afternoon .banner-orb-3{background:radial-gradient(circle,rgba(99,210,255,.1),transparent 70%);}
+.profile-hero-banner.evening .banner-orb-1{background:radial-gradient(circle,rgba(249,115,22,.2),transparent 70%);}
+.profile-hero-banner.evening .banner-orb-2{background:radial-gradient(circle,rgba(168,85,247,.16),transparent 70%);}
+.profile-hero-banner.evening .banner-orb-3{background:radial-gradient(circle,rgba(239,68,68,.12),transparent 70%);}
+.profile-hero-banner.night .banner-orb-1{background:radial-gradient(circle,rgba(59,130,246,.2),transparent 70%);}
+.profile-hero-banner.night .banner-orb-2{background:radial-gradient(circle,rgba(168,85,247,.16),transparent 70%);}
+.profile-hero-banner.night .banner-orb-3{background:radial-gradient(circle,rgba(0,255,136,.1),transparent 70%);}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-14px) scale(1.04);}}
+.banner-scan{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);animation:scanMove 5s linear infinite;pointer-events:none;}
+@keyframes scanMove{0%{left:-60%;}100%{left:160%;}}
+.banner-greeting-wrap{margin-bottom:0px;position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center;padding:0 36px;z-index:5;}
+.banner-greeting-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;opacity:0;animation:greetFadeUp .6s ease .1s forwards;}
+.banner-greeting-eyebrow-line{width:22px;height:2px;border-radius:2px;}
+.morning .banner-greeting-eyebrow-line{background:#ffb030;}
+.afternoon .banner-greeting-eyebrow-line{background:#00ff88;}
+.evening .banner-greeting-eyebrow-line{background:#f97316;}
+.night .banner-greeting-eyebrow-line{background:#818cf8;}
+.banner-greeting-eyebrow-text{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.6;}
+.morning .banner-greeting-eyebrow-text{color:#ffca70;}
+.afternoon .banner-greeting-eyebrow-text{color:#00ff88;}
+.evening .banner-greeting-eyebrow-text{color:#fb923c;}
+.night .banner-greeting-eyebrow-text{color:#a5b4fc;}
+.banner-greeting-main{font-family:'Sora',sans-serif;font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-.5px;color:#fff;opacity:0;animation:greetFadeUp .6s ease .25s forwards;}
+.banner-greeting-main .greeting-name{background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline;}
+.morning .banner-greeting-main .greeting-name{background-image:linear-gradient(90deg,#ffca70,#ff8c30);}
+.afternoon .banner-greeting-main .greeting-name{background-image:linear-gradient(90deg,#00ff88,#00d4ff);}
+.evening .banner-greeting-main .greeting-name{background-image:linear-gradient(90deg,#fb923c,#f472b6);}
+.night .banner-greeting-main .greeting-name{background-image:linear-gradient(90deg,#818cf8,#c084fc);}
+.banner-greeting-wave{display:inline-block;-webkit-text-fill-color:initial;background:none;margin-left:4px;animation:wavingHand .8s ease-in-out 1.2s 3;transform-origin:70% 70%;}
+@keyframes wavingHand{0%,100%{transform:rotate(0deg);}25%{transform:rotate(20deg);}75%{transform:rotate(-10deg);}}
+.banner-greeting-sub{margin-top:10px;font-size:13px;font-weight:400;color:rgba(255,255,255,.45);opacity:0;animation:greetFadeUp .6s ease .42s forwards;letter-spacing:.1px;max-width:520px;}
+.banner-greeting-sub strong{font-weight:600;}
+.morning .banner-greeting-sub strong{color:rgba(255,200,100,.75);}
+.afternoon .banner-greeting-sub strong{color:rgba(0,255,136,.65);}
+.evening .banner-greeting-sub strong{color:rgba(249,115,22,.7);}
+.night .banner-greeting-sub strong{color:rgba(165,180,252,.65);}
+.banner-motive-tag{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:5px 14px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.3px;opacity:0;animation:greetFadeUp .6s ease .58s forwards;backdrop-filter:blur(8px);}
+.banner-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2;}
+.bp{position:absolute;border-radius:50%;animation:bpFloat linear infinite;}
+@keyframes bpFloat{0%{transform:translateY(0) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:.5;}100%{transform:translateY(-120px) translateX(30px);opacity:0;}}
+@keyframes greetFadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* REST OF PROFILE HERO */
+.profile-hero-body{padding:0 32px 28px;position:relative;z-index:2;}
+.profile-avatar-wrap{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-52px;margin-bottom:20px;}
+.profile-avatar-outer{position:relative;width:104px;height:104px;flex-shrink:0;}
+.profile-avatar{width:104px;height:104px;border-radius:24px;border:3px solid rgba(0,255,136,.3);background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,212,170,.08));display:flex;align-items:center;justify-content:center;font-size:42px;color:#00ff88;box-shadow:0 0 30px rgba(0,255,136,.2),0 8px 32px rgba(0,0,0,.6);overflow:hidden;cursor:pointer;transition:.3s;position:relative;}
+.profile-avatar:hover{box-shadow:0 0 40px rgba(0,255,136,.35);}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:21px;}
+.avatar-upload-overlay{position:absolute;inset:0;border-radius:21px;background:rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:.3s;cursor:pointer;}
+.profile-avatar:hover .avatar-upload-overlay{opacity:1;}
+.avatar-upload-overlay i{font-size:20px;color:white;margin-bottom:4px;}
+.avatar-upload-overlay span{font-size:10px;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.5px;}
+.online-dot{position:absolute;bottom:16px;right:10px;width:11px;height:11px;border-radius:50%;background:#00ff88;border:1px solid #050505;box-shadow:0 0 6px rgba(0,255,136,.6);}
+.profile-hero-actions{display:flex;gap:10px;align-items:center;padding-bottom:4px;}
+.edit-profile-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;border-radius:12px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:.3s;box-shadow:0 0 20px rgba(0,255,136,.2);font-family:'Poppins',sans-serif;}
+.edit-profile-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,136,.35);}
+.share-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;transition:.25s;}
+.share-btn:hover{border-color:rgba(255,255,255,.2);color:white;}
+.profile-name-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+.profile-name{font-family:'Sora',sans-serif;font-size:28px;font-weight:700;color:#e2e8f0;letter-spacing:-.5px;}
+.profile-username{font-size:14px;color:#475569;font-weight:400;}
+.verified-badge{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00ff88;font-size:11px;font-weight:600;}
+.profile-bio{font-size:14px;color:#64748b;line-height:1.7;max-width:600px;margin-bottom:16px;}
+.profile-bio-empty{font-size:13px;color:#334155;font-style:italic;}
+.profile-meta-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.profile-meta-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#475569;}
+.profile-meta-item i{font-size:12px;color:#334155;}
+
+/* STATS ROW */
+.profile-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.profile-stat-card{padding:20px;border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);text-align:center;transition:.3s;cursor:default;position:relative;overflow:hidden;}
+.profile-stat-card::after{content:"";position:absolute;width:80px;height:80px;top:-30px;right:-20px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);pointer-events:none;}
+.profile-stat-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.12);}
+.profile-stat-card.green{--glow:rgba(0,255,136,.08);}
+.profile-stat-card.blue{--glow:rgba(59,130,246,.08);}
+.profile-stat-card.amber{--glow:rgba(250,204,21,.06);}
+.profile-stat-card.purple{--glow:rgba(168,85,247,.07);}
+.profile-stat-icon{width:40px;height:40px;border-radius:12px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.profile-stat-val{font-size:36px;font-weight:700;line-height:1;margin-bottom:5px;}
+.profile-stat-label{font-size:12px;color:#64748b;}
+.profile-stat-sub{font-size:10px;margin-top:6px;padding:2px 8px;border-radius:20px;display:inline-block;}
+
+/* CONTENT GRID */
+.profile-grid{display:grid;grid-template-columns:320px 1fr;gap:18px;}
+
+/* LEFT PANEL */
+.profile-left{display:flex;flex-direction:column;gap:16px;}
+.info-card{padding:22px;border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,.06);}
+.info-card-title{font-size:14px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.info-card-title i{font-size:13px;color:#00ff88;}
+.info-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.info-row:last-child{border-bottom:none;padding-bottom:0;}
+.info-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.info-label{font-size:11px;color:#334155;font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
+.info-value{font-size:13px;color:#94a3b8;font-weight:500;}
+.info-value.highlight{color:#00ff88;}
+.status-options{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.status-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;cursor:pointer;transition:.25s;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);}
+.status-option:hover{background:rgba(255,255,255,.04);}
+.status-option.selected{border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.05);}
+.status-option-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.status-option-label{font-size:13px;color:#94a3b8;}
+.status-option.selected .status-option-label{color:#e2e8f0;}
+.ach-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ach-mini-item{padding:14px 8px;border-radius:14px;text-align:center;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);transition:.25s;}
+.ach-mini-item:hover{background:rgba(255,255,255,.04);}
+.ach-mini-item.unlocked{border-color:rgba(0,255,136,.15);background:rgba(0,255,136,.03);}
+.ach-mini-item.locked{opacity:.35;}
+.ach-mini-icon{width:36px;height:36px;border-radius:10px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ach-mini-name{font-size:9px;color:#475569;font-weight:500;line-height:1.3;}
+.ach-mini-item.unlocked .ach-mini-name{color:#64748b;}
+
+/* RIGHT PANEL */
+.profile-right{display:flex;flex-direction:column;gap:16px;}
+.recent-progress-list{display:flex;flex-direction:column;gap:10px;}
+.rp-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);transition:.25s;cursor:pointer;}
+.rp-item:hover{background:rgba(255,255,255,.03);transform:translateX(4px);}
+.rp-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.rp-info{flex:1;}
+.rp-name{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:3px;}
+.rp-date{font-size:11px;color:#475569;}
+.rp-bar-wrap{flex:1;max-width:120px;}
+.rp-bar{height:5px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden;}
+.rp-fill{height:100%;border-radius:20px;transition:width .8s ease;}
+.rp-pct{font-size:12px;font-weight:700;min-width:36px;text-align:right;}
+.rp-status{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;flex-shrink:0;}
+
+/* ═══════════════════════════════════════════
+   ACTIVITY HEATMAP — FIXED LEGEND
+═══════════════════════════════════════════ */
+.heatmap-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:3px;margin-top:12px;}
+.heatmap-cell{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.04);transition:.2s;cursor:default;}
+.heatmap-cell.level-1{background:rgba(0,255,136,.15);}
+.heatmap-cell.level-2{background:rgba(0,255,136,.35);}
+.heatmap-cell.level-3{background:rgba(0,255,136,.6);}
+.heatmap-cell.level-4{background:#00ff88;}
+.heatmap-cell:hover{opacity:.8;transform:scale(1.1);}
+
+/* Legend — explicit background on each cell so they always show */
+.heatmap-legend{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;margin-top:10px;justify-content:flex-end;}
+.heatmap-legend-cell{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.heatmap-legend-cell.lc-0{background:rgba(255,255,255,.04);}
+.heatmap-legend-cell.lc-1{background:rgba(0,255,136,.15);}
+.heatmap-legend-cell.lc-2{background:rgba(0,255,136,.35);}
+.heatmap-legend-cell.lc-3{background:rgba(0,255,136,.6);}
+.heatmap-legend-cell.lc-4{background:#00ff88;}
+
+/* STREAK TIMELINE */
+.streak-timeline{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.st-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);}
+.st-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.st-info{flex:1;}
+.st-label{font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:2px;}
+.st-sub{font-size:11px;color:#475569;}
+.st-val{font-size:18px;font-weight:700;}
+
+/* POPUP */
+@keyframes popupAnim{from{opacity:0;transform:scale(.95) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(14px);display:none;justify-content:center;align-items:center;z-index:99999;padding:20px;}
+.popup-overlay.show{display:flex;}
+.edit-profile-modal{width:100%;max-width:480px;background:linear-gradient(145deg,rgba(8,10,20,.99),rgba(5,7,14,.99));border:1px solid rgba(0,255,136,.15);border-radius:26px;padding:32px;animation:popupAnim .3s ease;box-shadow:0 0 60px rgba(0,255,136,.06),0 20px 60px rgba(0,0,0,.8);max-height:90vh;overflow-y:auto;}
+.edit-profile-modal::-webkit-scrollbar{width:4px;}
+.edit-profile-modal::-webkit-scrollbar-thumb{background:rgba(0,255,136,.15);border-radius:20px;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.modal-title{display:flex;align-items:center;gap:12px;}
+.modal-title-icon{width:44px;height:44px;border-radius:14px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);display:flex;align-items:center;justify-content:center;font-size:20px;color:#00ff88;}
+.modal-title h2{font-size:20px;font-weight:700;color:#e2e8f0;letter-spacing:-.3px;}
+.modal-close{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#64748b;cursor:pointer;transition:.3s;font-size:18px;}
+.modal-close:hover{transform:rotate(90deg);background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.2);}
+.modal-avatar-section{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:24px;padding:24px 20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:18px;}
+.modal-avatar-preview{width:90px;height:90px;border-radius:20px;background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,212,170,.06));border:2px solid rgba(0,255,136,.2);display:flex;align-items:center;justify-content:center;font-size:38px;color:#00ff88;overflow:hidden;position:relative;cursor:pointer;transition:.3s;}
+.modal-avatar-preview:hover{border-color:rgba(0,255,136,.45);box-shadow:0 0 20px rgba(0,255,136,.12);}
+.modal-avatar-preview img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
+.modal-avatar-preview .ov{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:.3s;border-radius:18px;}
+.modal-avatar-preview:hover .ov{opacity:1;}
+.modal-avatar-preview .ov i{font-size:18px;color:white;}
+.modal-avatar-preview .ov span{font-size:9px;color:rgba(255,255,255,.8);font-weight:600;margin-top:4px;}
+.modal-avatar-label{font-size:13px;color:#64748b;text-align:center;line-height:1.5;}
+.avatar-btn-row{display:flex;align-items:center;gap:10px;}
+.upload-photo-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;border-radius:12px;background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,212,170,.06));border:1px solid rgba(0,255,136,.25);color:#00ff88;font-size:13px;font-weight:600;cursor:pointer;transition:.25s;font-family:'Poppins',sans-serif;margin-left:0px;}
+.upload-photo-btn:hover{background:linear-gradient(135deg,rgba(0,255,136,.18),rgba(0,212,170,.1));}
+.remove-photo-icon-btn{width:38px;height:38px;background:none;border:none;color:#ef4444;font-size:14px;display:none;align-items:center;justify-content:center;cursor:pointer;transition:.25s;flex-shrink:0;margin-left:-5px;}
+.form-group{margin-bottom:18px;}
+.form-label{font-size:11px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.form-label i{font-size:11px;color:#334155;}
+.form-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 16px;color:white;font-size:14px;outline:none;font-family:'Poppins',sans-serif;transition:.25s;}
+.form-input:focus{border-color:rgba(0,255,136,.3);box-shadow:0 0 15px rgba(0,255,136,.06);}
+.form-input::placeholder{color:#334155;}
+.form-textarea{width:100%;height:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 16px;color:white;font-size:13px;outline:none;font-family:'Poppins',sans-serif;resize:none;transition:.25s;}
+.form-textarea:focus{border-color:rgba(0,255,136,.3);box-shadow:0 0 15px rgba(0,255,136,.06);}
+.form-textarea::placeholder{color:#334155;}
+.char-hint{font-size:11px;color:#334155;text-align:right;margin-top:5px;}
+.modal-actions{display:flex;gap:12px;margin-top:24px;}
+.modal-cancel-btn{flex:1;height:46px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#94a3b8;font-size:14px;font-weight:500;cursor:pointer;transition:.25s;font-family:'Poppins',sans-serif;}
+.modal-cancel-btn:hover{background:rgba(255,255,255,.08);color:white;}
+.modal-save-btn{flex:2;height:46px;border-radius:14px;background:linear-gradient(135deg,#00ff88,#00d4aa);color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.3s;font-family:'Poppins',sans-serif;box-shadow:0 0 20px rgba(0,255,136,.2);}
+.modal-save-btn:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(0,255,136,.35);}
+
+/* Logout popup */
+.logout-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:20px;}
+.logout-confirm-overlay.show{display:flex;}
+.logout-confirm-modal{width:100%;max-width:400px;background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px;text-align:center;animation:popupAnim .3s ease;}
+.logout-confirm-icon{width:58px;height:58px;border-radius:18px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:24px;color:#ef4444;margin:0 auto 16px;}
+.logout-confirm-title{font-size:20px;font-weight:700;color:#e2e8f0;margin-bottom:8px;}
+.logout-confirm-desc{font-size:13px;color:#64748b;margin-bottom:22px;line-height:1.5;}
+.logout-confirm-btns{display:flex;gap:10px;}
+.logout-cancel-btn{flex:1;height:44px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:14px;font-weight:500;cursor:pointer;transition:.25s;font-family:'Poppins',sans-serif;}
+.logout-cancel-btn:hover{background:rgba(255,255,255,.08);color:white;}
+.logout-ok-btn{flex:1;height:44px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Poppins',sans-serif;}
+.logout-ok-btn:hover{transform:translateY(-1px);}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;right:30px;z-index:999999;display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:16px;background:linear-gradient(145deg,rgba(10,10,10,.99),rgba(6,6,6,.99));border:1px solid rgba(0,255,136,.2);box-shadow:0 0 30px rgba(0,0,0,.6);font-size:13px;font-weight:500;color:#e2e8f0;transform:translateY(20px);opacity:0;transition:.35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast i{font-size:16px;color:#00ff88;}
+
+/* FOOTER */
+.footer{margin-top:50px;padding:24px 0 14px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+.footer-top{display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:14px;flex-wrap:wrap;}
+.footer-link{color:#475569;font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.footer-link:hover{color:#00ff88;}
+.footer-copy{font-size:12px;color:#334155;}
+.upload-note{font-size:12px;color:#94a3b83e;text-align:center;margin-top:-4px;margin-right:5px;}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-left">
+    <img src="Picsart_26-05-19_08-40-08-746.png" onclick="window.location.href='dashboard.html'">
+  </div>
+  <div class="nav-right">
+    <button class="create-nav-btn" onclick="window.location.href='create.html'"><i class="fa-solid fa-plus"></i> New Progress</button>
+    <button class="analytics-nav-btn" onclick="window.location.href='analytics.html'"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+    <div class="tooltip-btn"><button class="nav-icon-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-house"></i></button><span class="tooltip">Home</span></div>
+    <div class="tooltip-btn"><button class="nav-icon-btn" onclick="window.location.href='saved.html'"><i class="fa-regular fa-floppy-disk"></i></button><span class="tooltip">Saved</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="profile-hero">
+    <div class="profile-hero-bg"></div>
+
+    <!-- FUTURISTIC GREETING BANNER -->
+    <div class="profile-hero-banner" id="greetBanner">
+      <div class="banner-mesh"></div>
+      <div class="banner-orb banner-orb-1"></div>
+      <div class="banner-orb banner-orb-2"></div>
+      <div class="banner-orb banner-orb-3"></div>
+      <div class="banner-scan"></div>
+      <div class="banner-particles" id="bannerParticles"></div>
+      <div class="banner-greeting-wrap">
+        <div class="banner-greeting-eyebrow">
+          <div class="banner-greeting-eyebrow-line"></div>
+          <span class="banner-greeting-eyebrow-text" id="greetEyebrow">Welcome Back</span>
+        </div>
+        <div class="banner-greeting-main" id="greetMain">
+          <span id="greetText">Good Morning, </span><span class="greeting-name" id="greetName">User</span><span class="banner-greeting-wave">👋</span>
+        </div>
+        <div class="banner-greeting-sub" id="greetSub">
+          <strong id="greetMotiveLine">Your consistency is building something extraordinary.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-hero-body">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-outer">
+          <div class="profile-avatar" id="profileAvatarMain" onclick="openEditProfile()">
+            <i class="fa-solid fa-user" id="profileAvatarInner" style="font-size:42px;color:#00ff88;"></i>
+            <div class="avatar-upload-overlay"><i class="fa-solid fa-camera"></i><span>EDIT</span></div>
+          </div>
+          <div class="online-dot" id="onlineDot"></div>
+        </div>
+        <div class="profile-hero-actions">
+          <button class="edit-profile-btn" onclick="openEditProfile()"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</button>
+          <button class="share-btn" onclick="copyProfileLink()">
+            <i class="fa-solid fa-user-plus"></i> Invite
+          </button>
+        </div>
+      </div>
+      <div class="profile-name-row">
+        <span class="profile-name" id="displayName">Progress User</span>
+        <span class="profile-username" id="displayUsername">@user</span>
+        <div class="verified-badge"><i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Verified</div>
+      </div>
+      <div class="profile-bio" id="displayBio">
+        <span class="profile-bio-empty">No bio yet. Click Edit Profile to add one.</span>
+      </div>
+      <div class="profile-meta-row">
+        <div class="profile-meta-item"><i class="fa-regular fa-calendar-plus"></i><span id="joinedDate">Joined recently</span></div>
+        <div class="profile-meta-item" id="metaLocation" style="display:none;"><i class="fa-solid fa-location-dot"></i><span id="displayLocation"></span></div>
+        <div class="profile-meta-item"><i class="fa-solid fa-circle" id="statusDot" style="color:#00ff88;font-size:7px;"></i><span id="statusLabel">Active</span></div>
+        <div class="profile-meta-item"><i class="fa-solid fa-fire" style="color:#f97316;"></i><span id="streakMeta">0 day streak</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="profile-stats-row">
+    <div class="profile-stat-card green">
+      <div class="profile-stat-icon" style="background:rgba(0,255,136,.08);color:#00ff88;"><i class="fa-solid fa-chart-line"></i></div>
+      <div class="profile-stat-val" style="color:#00ff88;" id="statTotal">0</div>
+      <div class="profile-stat-label">Total Progress</div>
+      <div class="profile-stat-sub" style="background:rgba(0,255,136,.08);color:#00ff88;">All Created</div>
+    </div>
+    <div class="profile-stat-card blue">
+      <div class="profile-stat-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="profile-stat-val" style="color:#3b82f6;" id="statCompleted">0</div>
+      <div class="profile-stat-label">Completed Goals</div>
+      <div class="profile-stat-sub" style="background:rgba(59,130,246,.08);color:#3b82f6;">Finished</div>
+    </div>
+    <div class="profile-stat-card amber">
+      <div class="profile-stat-icon" style="background:rgba(250,204,21,.08);color:#facc15;"><i class="fa-solid fa-fire"></i></div>
+      <div class="profile-stat-val" style="color:#facc15;" id="statStreak">0</div>
+      <div class="profile-stat-label">Best Streak</div>
+      <div class="profile-stat-sub" style="background:rgba(250,204,21,.06);color:#facc15;">Days</div>
+    </div>
+    <div class="profile-stat-card purple">
+      <div class="profile-stat-icon" style="background:rgba(168,85,247,.08);color:#a855f7;"><i class="fa-solid fa-calendar-check"></i></div>
+      <div class="profile-stat-val" style="color:#a855f7;" id="statDays">0</div>
+      <div class="profile-stat-label">Productive Days</div>
+      <div class="profile-stat-sub" style="background:rgba(168,85,247,.06);color:#a855f7;">Logged</div>
+    </div>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="profile-grid">
+
+    <!-- LEFT -->
+    <div class="profile-left">
+
+      <!-- USER INFO -->
+      <div class="info-card">
+        <div class="info-card-title"><i class="fa-solid fa-user"></i> User Information</div>
+        <div class="info-row">
+          <div class="info-icon" style="background:rgba(0,255,136,.08);color:#00ff88;"><i class="fa-solid fa-user-tag"></i></div>
+          <div><div class="info-label">Username</div><div class="info-value highlight" id="infoUsername">@user</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:rgba(59,130,246,.08);color:#3b82f6;"><i class="fa-regular fa-calendar-plus"></i></div>
+          <div><div class="info-label">Date Joined</div><div class="info-value" id="infoJoined">—</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:rgba(250,204,21,.08);color:#facc15;"><i class="fa-solid fa-chart-line"></i></div>
+          <div><div class="info-label">Overall Rate</div><div class="info-value" id="infoRate">0%</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:rgba(168,85,247,.08);color:#a855f7;"><i class="fa-solid fa-trophy"></i></div>
+          <div><div class="info-label">Achievements</div><div class="info-value" id="infoAch">0 Unlocked</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:rgba(249,115,22,.08);color:#f97316;"><i class="fa-solid fa-clock"></i></div>
+          <div><div class="info-label">Active Goals</div><div class="info-value" id="infoActive">0 In Progress</div></div>
+        </div>
+      </div>
+
+      <!-- ACTIVE STATUS -->
+      <div class="info-card">
+        <div class="info-card-title"><i class="fa-solid fa-signal"></i> Active Status</div>
+        <div class="status-options">
+          <div class="status-option selected" id="statusActive" onclick="setStatus('active')">
+            <div class="status-option-dot" style="background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.6);"></div>
+            <div><div class="status-option-label">Active</div><div style="font-size:10px;color:#475569;margin-top:1px;">Visible &amp; tracking</div></div>
+          </div>
+          <div class="status-option" id="statusFocus" onclick="setStatus('focus')">
+            <div class="status-option-dot" style="background:#facc15;box-shadow:0 0 6px rgba(250,204,21,.5);"></div>
+            <div><div class="status-option-label">Focus Mode</div><div style="font-size:10px;color:#475569;margin-top:1px;">Do not disturb</div></div>
+          </div>
+          <div class="status-option" id="statusAway" onclick="setStatus('away')">
+            <div class="status-option-dot" style="background:#f97316;box-shadow:0 0 6px rgba(249,115,22,.5);"></div>
+            <div><div class="status-option-label">Away</div><div style="font-size:10px;color:#475569;margin-top:1px;">Temporarily inactive</div></div>
+          </div>
+          <div class="status-option" id="statusOffline" onclick="setStatus('offline')">
+            <div class="status-option-dot" style="background:#475569;"></div>
+            <div><div class="status-option-label">Offline</div><div style="font-size:10px;color:#475569;margin-top:1px;">Not available</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS MINI -->
+      <div class="info-card">
+        <div class="info-card-title"><i class="fa-solid fa-trophy"></i> Achievements</div>
+        <div class="ach-mini-grid" id="achMiniGrid"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="profile-right">
+
+      <!-- ACTIVITY HEATMAP -->
+      <div class="info-card">
+        <div class="info-card-title">
+          <i class="fa-solid fa-fire"></i> Activity Heatmap
+          <span style="font-size:11px;color:#334155;font-weight:400;margin-left:4px;">Last 6 months</span>
+        </div>
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+
+        <!-- ✅ FIXED LEGEND — each cell now has its own explicit color class -->
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="heatmap-legend-cell lc-0"></div>
+          <div class="heatmap-legend-cell lc-1"></div>
+          <div class="heatmap-legend-cell lc-2"></div>
+          <div class="heatmap-legend-cell lc-3"></div>
+          <div class="heatmap-legend-cell lc-4"></div>
+          <span>More</span>
+        </div>
+      </div>
+
+      <!-- STREAK STATS -->
+      <div class="info-card">
+        <div class="info-card-title"><i class="fa-solid fa-fire-flame-curved"></i> Streak &amp; Performance</div>
+        <div class="streak-timeline" id="streakTimeline"></div>
+      </div>
+
+      <!-- RECENT PROGRESS -->
+      <div class="info-card">
+        <div class="info-card-title">
+          <i class="fa-solid fa-list-check"></i> Recent Progress
+          <span style="font-size:11px;color:#334155;font-weight:400;margin-left:4px;">Last 5</span>
+        </div>
+        <div class="recent-progress-list" id="recentProgressList">
+          <div style="text-align:center;padding:28px;color:#334155;font-size:13px;"><i class="fa-regular fa-folder-open" style="font-size:24px;display:block;margin-bottom:10px;opacity:.5;"></i>No progress yet</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-top">
+      <a href="/support" class="footer-link"><i class="fa-regular fa-envelope"></i> Support</a>
+      <a href="/feedback" class="footer-link"><i class="fa-regular fa-comment-dots"></i> Feedback</a>
+      <a href="/termsandconditions" class="footer-link"><i class="fa-solid fa-file-lines"></i> Terms &amp; Conditions</a>
+    </div>
+    <div class="footer-copy">© Progress Tracker 2026 — All Rights Reserved</div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE POPUP -->
+<div id="editProfilePopup" class="popup-overlay">
+  <div class="edit-profile-modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-title-icon"><i class="fa-solid fa-user-pen"></i></div>
+        <h2>Edit Profile</h2>
+      </div>
+      <div class="modal-close" onclick="closeEditProfile()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="modal-avatar-section">
+      <div class="modal-avatar-preview" id="modalAvatarPreview" onclick="document.getElementById('avatarUploadInput').click()">
+        <i class="fa-solid fa-user" id="modalAvatarInner" style="font-size:38px;color:#00ff88;"></i>
+        <div class="ov"><i class="fa-solid fa-camera"></i><span>Change</span></div>
+      </div>
+      <div class="modal-avatar-label">Upload a profile photo or keep the default.</div>
+      <div class="avatar-btn-row">
+        <button class="upload-photo-btn" onclick="document.getElementById('avatarUploadInput').click()">
+          <i class="fa-solid fa-upload"></i> Upload Photo
+        </button>
+        <button class="remove-photo-icon-btn" id="removePhotoIconBtn" onclick="removePhoto()" title="Remove photo">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+      <p class="upload-note">Max image size: 1MB</p>
+      <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+    </div>
+    <div class="form-group">
+      <div class="form-label"><i class="fa-solid fa-user"></i> Display Name</div>
+      <input id="editName" class="form-input" type="text" placeholder="Your display name..." maxlength="40">
+    </div>
+    <div class="form-group">
+      <div class="form-label"><i class="fa-solid fa-at"></i> Username</div>
+      <input id="editUsername" class="form-input" type="text" placeholder="@username" maxlength="30" readonly style="opacity:.5;cursor:not-allowed;">
+    </div>
+    <div class="form-group">
+      <div class="form-label"><i class="fa-solid fa-align-left"></i> Bio</div>
+      <textarea id="editBio" class="form-textarea" placeholder="Tell us about yourself..." maxlength="150" oninput="updateBioCounter()"></textarea>
+      <div class="char-hint"><span id="bioCounter">0</span> / 150</div>
+    </div>
+    <div class="form-group">
+      <div class="form-label"><i class="fa-solid fa-location-dot"></i> Location <span style="color:#334155;font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;">(optional)</span></div>
+      <input id="editLocation" class="form-input" type="text" placeholder="City, Country..." maxlength="40" list="locationSuggestions">
+      <datalist id="locationSuggestions">
+        <option value="Chennai">
+        <option value="Coimbatore">
+        <option value="Madurai">
+        <option value="Trichy">
+        <option value="Salem">
+        <option value="Bangalore">
+        <option value="Hyderabad">
+        <option value="Mumbai">
+        <option value="Delhi">
+        <option value="Kolkata">
+      </datalist>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeEditProfile()">Cancel</button>
+      <button class="modal-save-btn" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk" style="margin-right:8px;"></i>Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT -->
+<div id="logoutConfirm" class="logout-confirm-overlay">
+  <div class="logout-confirm-modal">
+    <div class="logout-confirm-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+    <div class="logout-confirm-title">Logout?</div>
+    <div class="logout-confirm-desc">Are you sure you want to log out of Progress Tracker?</div>
+    <div class="logout-confirm-btns">
+      <button class="logout-cancel-btn" onclick="closeLogoutConfirm()">Cancel</button>
+      <button class="logout-ok-btn" onclick="confirmLogout()">Yes, Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Saved!</span></div>
+
+<!-- GREETING BANNER SCRIPT -->
+<script>
+(function(){
+  const banner   = document.getElementById('greetBanner');
+  const eyebrow  = document.getElementById('greetEyebrow');
+  const greetTxt = document.getElementById('greetText');
+  const greetNm  = document.getElementById('greetName');
+  const motiveEl = document.getElementById('greetMotiveLine');
+
+  const slots = {
+    morning: {
+      hours:[5,6,7,8,9,10,11],
+      class:'morning',
+      greeting:'Good Morning ,',
+      eyebrow:'✦ Rise &amp; Shine',
+      motives:[
+        'Your consistency is <strong>building something extraordinary.</strong>',
+        'Every morning is a <strong>fresh chance to grow.</strong>',
+        'Start strong — <strong>momentum begins now.</strong>'
+      ]
+    },
+    afternoon: {
+      hours:[12,13,14,15,16],
+      class:'afternoon',
+      greeting:'Good Afternoon ,',
+      eyebrow:'✦ Keep the Momentum',
+      motives:[
+        'You\'re in the zone — <strong>keep pushing forward.</strong>',
+        'Midday check-in: <strong>you\'re doing great.</strong>',
+        'Stay focused — <strong>every step counts.</strong>'
+      ]
+    },
+    evening: {
+      hours:[17,18,19,20],
+      class:'evening',
+      greeting:'Good Evening ,',
+      eyebrow:'✦ Reflect &amp; Recharge',
+      motives:[
+        'Another day of progress — <strong>you showed up.</strong>',
+        'Wind down proud — <strong>today was a win.</strong>',
+        'Reflect on today, <strong>plan for tomorrow.</strong>'
+      ]
+    },
+    night: {
+      hours:[21,22,23,0,1,2,3,4],
+      class:'night',
+      greeting:'Good Night,',
+      eyebrow:'✦ Rest &amp; Recover',
+      motives:[
+        'Rest well — <strong>greatness needs recovery too.</strong>',
+        'Your hard work deserves <strong>a good night\'s sleep.</strong>',
+        'Tomorrow you rise again, <strong>stronger than ever.</strong>'
+      ]
+    }
+  };
+
+  function getSlot(h){
+    for(let k in slots){ if(slots[k].hours.includes(h)) return slots[k]; }
+    return slots.morning;
+  }
+
+  let lastSlotClass='';
+
+  function applyGreeting(name){
+    let now=new Date();
+    let h=now.getHours();
+    let slot=getSlot(h);
+    if(slot.class!==lastSlotClass){
+      banner.classList.remove('morning','afternoon','evening','night');
+      banner.classList.add(slot.class);
+      lastSlotClass=slot.class;
+      if(eyebrow) eyebrow.innerHTML=slot.eyebrow;
+      if(greetTxt) greetTxt.textContent=slot.greeting+' ';
+      let m=Math.floor(Math.random()*slot.motives.length);
+      if(motiveEl) motiveEl.innerHTML=slot.motives[m];
+      ['banner-greeting-eyebrow','banner-greeting-main','banner-greeting-sub'].forEach(cls=>{
+        let el=banner.querySelector('.'+cls);
+        if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; }
+      });
+    }
+    if(greetNm) greetNm.textContent=name||'User';
+  }
+
+  function spawnParticles(){
+    let container=document.getElementById('bannerParticles');
+    if(!container) return;
+    container.innerHTML='';
+    const colors={morning:['#ffca70','#ff8c30','#fff'],afternoon:['#00ff88','#00d4ff','#fff'],evening:['#fb923c','#f472b6','#fff'],night:['#818cf8','#c084fc','#fff']};
+    let slot=banner.classList.contains('morning')?'morning':banner.classList.contains('afternoon')?'afternoon':banner.classList.contains('evening')?'evening':'night';
+    let cols=colors[slot];
+    for(let i=0;i<18;i++){
+      let dot=document.createElement('div');
+      dot.className='bp';
+      let size=Math.random()*3+2;
+      let col=cols[Math.floor(Math.random()*cols.length)];
+      let left=Math.random()*100;
+      let delay=Math.random()*6;
+      let dur=Math.random()*5+5;
+      dot.style.cssText=`width:${size}px;height:${size}px;left:${left}%;bottom:${Math.random()*60}px;background:${col};opacity:${Math.random()*.5+.1};animation-duration:${dur}s;animation-delay:${delay}s;`;
+      container.appendChild(dot);
+    }
+  }
+
+  applyGreeting('User');
+  spawnParticles();
+
+  setInterval(()=>{ applyGreeting(window._greetDisplayName||'User'); },1000);
+
+  window._updateGreetName=function(name){
+    window._greetDisplayName=name;
+    if(greetNm) greetNm.textContent=name||'User';
+  };
+})();
+</script>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+
+import {
+  collection, getDocs, query, orderBy,
+  doc, deleteDoc, setDoc, updateDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+let profileData = null;
+let allProgress = [];
+let currentUserId = null;
+
+function lockScroll(){document.body.style.overflow="hidden";}
+function unlockScroll(){document.body.style.overflow="";}
+function parseDate(s){let[y,m,d]=s.split("-");return new Date(y,m-1,d);}
+function getTotalDays(s,e){return Math.floor((parseDate(e)-parseDate(s))/(864e5))+1;}
+
+async function saveProfileData(){
+  if(!currentUserId) return;
+  try{
+    await setDoc(doc(db,"users",currentUserId), {
+      name: profileData.name || "Progress User",
+      username: profileData.username || "user",
+      bio: profileData.bio || "",
+      location: profileData.location || "",
+      avatarType: profileData.avatarType || "default",
+      avatarImg: profileData.avatarImg || "",
+      status: profileData.status || "active",
+      joinedAt: profileData.joinedAt || Date.now()
+    }, { merge: true });
+  } catch(e){ console.error("Profile save error:", e); }
+}
+
+function calcStats(){
+  let totalGoals=allProgress.length,completedGoals=0,totalCompletedDays=0,bestStreak=0,tempStreak=0,totalDays=0,totalComp=0,active=0;
+  let today=new Date();today.setHours(0,0,0,0);
+  allProgress.forEach(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+    totalCompletedDays+=comp;totalDays+=td;totalComp+=comp;
+    if(comp===td&&td>0) completedGoals++;
+    let start=parseDate(p.startDate);start.setHours(0,0,0,0);
+    let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+    if(today>=start&&today<=end) active++;
+    tempStreak=0;
+    for(let i=1;i<=td;i++){if(p.data?.[i]?.status==="complete"){tempStreak++;bestStreak=Math.max(bestStreak,tempStreak);}else tempStreak=0;}
+  });
+  let rate=totalDays>0?Math.round((totalComp/totalDays)*100):0;
+  return{totalGoals,completedGoals,totalCompletedDays,bestStreak,rate,active};
+}
+
+function setAvatarDisplay(el, isImage, imgSrc){
+  if(!el) return;
+  if(isImage && imgSrc){
+    el.innerHTML=`<img src="${imgSrc}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:21px;"><div class="avatar-upload-overlay"><i class="fa-solid fa-camera"></i><span>EDIT</span></div>`;
+  } else {
+    el.innerHTML=`<i class="fa-solid fa-user" style="font-size:42px;color:#00ff88;"></i><div class="avatar-upload-overlay"><i class="fa-solid fa-camera"></i><span>EDIT</span></div>`;
+  }
+}
+
+function setModalAvatarDisplay(isImage, imgSrc){
+  let prev=document.getElementById("modalAvatarPreview");
+  let removeBtn=document.getElementById("removePhotoIconBtn");
+  if(!prev) return;
+  if(isImage && imgSrc){
+    prev.innerHTML=`<img src="${imgSrc}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:18px;"><div class="ov"><i class="fa-solid fa-camera"></i><span>Change</span></div>`;
+    if(removeBtn) removeBtn.style.display="flex";
+  } else {
+    prev.innerHTML=`<i class="fa-solid fa-user" style="font-size:38px;color:#00ff88;"></i><div class="ov"><i class="fa-solid fa-camera"></i><span>Change</span></div>`;
+    if(removeBtn) removeBtn.style.display="none";
+  }
+}
+
+function renderProfile(){
+  if(!profileData) return;
+  let s = calcStats();
+
+  if(window._updateGreetName) window._updateGreetName(profileData.name || "User");
+
+  let avatarMainEl = document.getElementById("profileAvatarMain");
+  setAvatarDisplay(avatarMainEl, profileData.avatarType==="image", profileData.avatarImg);
+
+  let nameEl = document.getElementById("displayName");
+  let userEl = document.getElementById("displayUsername");
+  let infoUser = document.getElementById("infoUsername");
+  if(nameEl) nameEl.innerText = profileData.name || "Progress User";
+  if(userEl) userEl.innerText = "@"+(profileData.username||"user");
+  if(infoUser) infoUser.innerText = "@"+(profileData.username||"user");
+
+  let bioEl = document.getElementById("displayBio");
+  if(bioEl){
+    if(profileData.bio && profileData.bio.trim()){
+      bioEl.innerHTML=`<span>${profileData.bio}</span>`;
+    } else {
+      bioEl.innerHTML=`<span class="profile-bio-empty">No bio yet. Click Edit Profile to add one.</span>`;
+    }
+  }
+
+  let locMeta = document.getElementById("metaLocation");
+  let locEl = document.getElementById("displayLocation");
+  if(profileData.location && profileData.location.trim()){
+    if(locEl) locEl.innerText = profileData.location;
+    if(locMeta) locMeta.style.display = "flex";
+  } else {
+    if(locMeta) locMeta.style.display = "none";
+  }
+
+  let joined = new Date(profileData.joinedAt || Date.now());
+  let joinedEl = document.getElementById("joinedDate");
+  let infoJoined = document.getElementById("infoJoined");
+  if(joinedEl) joinedEl.innerText = "Joined " + joined.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+  if(infoJoined) infoJoined.innerText = joined.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+  let statusColors = {active:"#00ff88",focus:"#facc15",away:"#f97316",offline:"#475569"};
+  let statusLabels = {active:"Active",focus:"Focus Mode",away:"Away",offline:"Offline"};
+  let sc = statusColors[profileData.status||"active"];
+  let statusDot = document.getElementById("statusDot");
+  let statusLabel = document.getElementById("statusLabel");
+  let onlineDot = document.getElementById("onlineDot");
+  if(statusDot) statusDot.style.color = sc;
+  if(statusLabel) statusLabel.innerText = statusLabels[profileData.status||"active"];
+  if(onlineDot){ onlineDot.style.background = sc; onlineDot.style.boxShadow = `0 0 8px ${sc}`; }
+
+  document.querySelectorAll(".status-option").forEach(el=>el.classList.remove("selected"));
+  let activeStatusEl = document.getElementById("status"+((profileData.status||"active").charAt(0).toUpperCase()+(profileData.status||"active").slice(1)));
+  if(activeStatusEl) activeStatusEl.classList.add("selected");
+
+  let statTotal = document.getElementById("statTotal");
+  let statCompleted = document.getElementById("statCompleted");
+  let statStreak = document.getElementById("statStreak");
+  let statDays = document.getElementById("statDays");
+  let streakMeta = document.getElementById("streakMeta");
+  let infoRate = document.getElementById("infoRate");
+  let infoActive = document.getElementById("infoActive");
+  if(statTotal) statTotal.innerText = s.totalGoals;
+  if(statCompleted) statCompleted.innerText = s.completedGoals;
+  if(statStreak) statStreak.innerText = s.bestStreak;
+  if(statDays) statDays.innerText = s.totalCompletedDays;
+  if(streakMeta) streakMeta.innerText = s.bestStreak+" day streak";
+  if(infoRate) infoRate.innerText = s.rate+"%";
+  if(infoActive) infoActive.innerText = s.active+" In Progress";
+
+  let achDefs=[
+    {id:"first_step",icon:"fa-shoe-prints",iconColor:"#00ff88",iconBg:"rgba(0,255,136,.1)",name:"First Step",unlocked:s.totalGoals>=1},
+    {id:"streak7",icon:"fa-fire",iconColor:"#f97316",iconBg:"rgba(249,115,22,.1)",name:"7 Day Streak",unlocked:s.bestStreak>=7},
+    {id:"goal_crusher",icon:"fa-trophy",iconColor:"#facc15",iconBg:"rgba(250,204,21,.1)",name:"Goal Crusher",unlocked:s.completedGoals>=3},
+    {id:"streak30",icon:"fa-crown",iconColor:"#a855f7",iconBg:"rgba(168,85,247,.1)",name:"Consistency",unlocked:s.bestStreak>=30},
+    {id:"century",icon:"fa-star",iconColor:"#3b82f6",iconBg:"rgba(59,130,246,.1)",name:"Century Club",unlocked:s.totalCompletedDays>=100},
+    {id:"legend",icon:"fa-gem",iconColor:"#00ff88",iconBg:"rgba(0,255,136,.1)",name:"Legend",unlocked:s.completedGoals>=3&&s.bestStreak>=30},
+  ];
+  let unlockedCount = achDefs.filter(a=>a.unlocked).length;
+  let infoAch = document.getElementById("infoAch");
+  let achGrid = document.getElementById("achMiniGrid");
+  if(infoAch) infoAch.innerText = unlockedCount+" Unlocked";
+  if(achGrid) achGrid.innerHTML = achDefs.map(a=>`
+    <div class="ach-mini-item${a.unlocked?" unlocked":" locked"}" title="${a.name}${a.unlocked?" ✓":" (Locked)"}">
+      <div class="ach-mini-icon" style="background:${a.iconBg};color:${a.iconColor};border:1px solid ${a.iconColor}22;">
+        <i class="fa-solid ${a.icon}"></i>
+      </div>
+      <div class="ach-mini-name">${a.name}</div>
+    </div>`).join("");
+
+  let rpEl = document.getElementById("recentProgressList");
+  if(rpEl){
+    if(allProgress.length===0){
+      rpEl.innerHTML=`<div style="text-align:center;padding:28px;color:#334155;font-size:13px;"><i class="fa-regular fa-folder-open" style="font-size:24px;display:block;margin-bottom:10px;opacity:.5;"></i>No progress yet</div>`;
+    } else {
+      let sorted=[...allProgress].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+      let colors=["#00ff88","#3b82f6","#a855f7","#facc15","#f97316"];
+      let bgs=["rgba(0,255,136,.1)","rgba(59,130,246,.1)","rgba(168,85,247,.1)","rgba(250,204,21,.08)","rgba(249,115,22,.08)"];
+      let icons=["fa-bullseye","fa-book","fa-dumbbell","fa-fire","fa-rocket"];
+      rpEl.innerHTML=sorted.map((p,i)=>{
+        let td=getTotalDays(p.startDate,p.endDate);
+        let comp=Object.values(p.data||{}).filter(d=>d.status==="complete").length;
+        let pct=Math.round((comp/td)*100)||0;
+        let today2=new Date();today2.setHours(0,0,0,0);
+        let end=parseDate(p.endDate);end.setHours(0,0,0,0);
+        let statusStr=pct===100?"Completed":today2>end?"Expired":"In Progress";
+        let sc2=pct===100?"rgba(34,197,94,.12)":today2>end?"rgba(239,68,68,.12)":"rgba(250,204,21,.12)";
+        let sv=pct===100?"#22c55e":today2>end?"#ef4444":"#facc15";
+        let barColor=pct<=40?"#ef4444":pct<=80?"#facc15":"#00ff88";
+        let navId = p.firestoreId || p.id;
+        return `<div class="rp-item" onclick="window.location.href='tracker.html?id=${navId}'">
+          <div class="rp-icon" style="background:${bgs[i%5]};color:${colors[i%5]};"><i class="fa-solid ${icons[i%5]}"></i></div>
+          <div class="rp-info"><div class="rp-name">${p.name}</div><div class="rp-date">${p.startDate} → ${p.endDate}</div></div>
+          <div class="rp-bar-wrap"><div class="rp-bar"><div class="rp-fill" style="width:${pct}%;background:${barColor};box-shadow:0 0 6px ${barColor};"></div></div></div>
+          <div class="rp-pct" style="color:${barColor};">${pct}%</div>
+          <div class="rp-status" style="background:${sc2};color:${sv};border:1px solid ${sv}33;">${statusStr}</div>
+        </div>`;
+      }).join("");
+    }
+  }
+
+  let stEl = document.getElementById("streakTimeline");
+  let currentStreak = 0;
+  allProgress.forEach(p=>{
+    let td=getTotalDays(p.startDate,p.endDate);
+    let cs=0;
+    for(let i=td;i>=1;i--){if(p.data?.[i]?.status==="complete")cs++;else if(p.data?.[i]?.status==="incomplete")break;}
+    currentStreak=Math.max(currentStreak,cs);
+  });
+  if(stEl) stEl.innerHTML=[
+    {icon:"fa-fire-flame-curved",color:"#f97316",bg:"rgba(249,115,22,.1)",label:"Current Streak",sub:"Consecutive days",val:currentStreak+"d",valColor:"#f97316"},
+    {icon:"fa-trophy",color:"#facc15",bg:"rgba(250,204,21,.08)",label:"Best Streak",sub:"Personal record",val:s.bestStreak+"d",valColor:"#facc15"},
+    {icon:"fa-chart-line",color:"#00ff88",bg:"rgba(0,255,136,.08)",label:"Completion Rate",sub:"Overall progress",val:s.rate+"%",valColor:"#00ff88"},
+    {icon:"fa-calendar-check",color:"#3b82f6",bg:"rgba(59,130,246,.08)",label:"Productive Days",sub:"Days completed",val:s.totalCompletedDays,valColor:"#3b82f6"},
+  ].map(it=>`<div class="st-item"><div class="st-icon" style="background:${it.bg};color:${it.color};"><i class="fa-solid ${it.icon}"></i></div><div class="st-info"><div class="st-label">${it.label}</div><div class="st-sub">${it.sub}</div></div><div class="st-val" style="color:${it.valColor};">${it.val}</div></div>`).join("");
+
+  buildHeatmap();
+}
+
+function buildHeatmap(){
+  let grid = document.getElementById("heatmapGrid");
+  if(!grid) return;
+  let cells = [];
+  let today = new Date(); today.setHours(0,0,0,0);
+  let start = new Date(today); start.setDate(start.getDate()-(26*7-1));
+  let dateMap = {};
+  allProgress.forEach(p=>{
+    let activeDates = getActiveDatesList(p);
+    activeDates.forEach((d,i)=>{
+      let key = d.toDateString();
+      if(p.data?.[i+1]?.status==="complete") dateMap[key]=(dateMap[key]||0)+1;
+    });
+  });
+  let cur = new Date(start);
+  while(cur<=today){
+    let key = cur.toDateString();
+    let count = dateMap[key]||0;
+    let level = count===0?0:count===1?1:count===2?2:count===3?3:4;
+    cells.push(`<div class="heatmap-cell${level>0?" level-"+level:""}" title="${cur.toLocaleDateString('en-US',{month:'short',day:'numeric'})}: ${count} completed"></div>`);
+    cur.setDate(cur.getDate()+1);
+  }
+  grid.innerHTML = cells.join("");
+}
+
+function getActiveDatesList(prog){
+  let start=parseDate(prog.startDate);start.setHours(0,0,0,0);
+  let end=parseDate(prog.endDate);end.setHours(0,0,0,0);
+  let dates=[],cur=new Date(start);
+  const map={0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+  while(cur<=end){
+    let active=(!prog.scheduleType||prog.scheduleType==='daily'||!prog.activeDays||prog.activeDays.length===0||prog.activeDays.includes(map[cur.getDay()]));
+    if(active) dates.push(new Date(cur));
+    cur.setDate(cur.getDate()+1);
+  }
+  return dates;
+}
+
+async function setStatus(s){
+  profileData.status = s;
+  await saveProfileData();
+  document.querySelectorAll(".status-option").forEach(el=>el.classList.remove("selected"));
+  let el = document.getElementById("status"+s.charAt(0).toUpperCase()+s.slice(1));
+  if(el) el.classList.add("selected");
+  let statusColors = {active:"#00ff88",focus:"#facc15",away:"#f97316",offline:"#475569"};
+  let statusLabels = {active:"Active",focus:"Focus Mode",away:"Away",offline:"Offline"};
+  let sc = statusColors[s];
+  let dot = document.getElementById("statusDot");
+  let label = document.getElementById("statusLabel");
+  let onlineDot = document.getElementById("onlineDot");
+  if(dot) dot.style.color = sc;
+  if(label) label.innerText = statusLabels[s];
+  if(onlineDot){ onlineDot.style.background=sc; onlineDot.style.boxShadow=`0 0 8px ${sc}`; }
+  showToast("Status updated to "+statusLabels[s]+"!");
+}
+
+function handleAvatarUpload(e){
+  let file = e.target.files[0];
+  if(!file) return;
+  const maxSize = 1024 * 1024;
+  if(file.size > maxSize){
+    showToast("Please upload an image below 1MB");
+    e.target.value = "";
+    return;
+  }
+  let reader = new FileReader();
+  reader.onload = function(ev){
+    profileData.avatarType = "image";
+    profileData.avatarImg = ev.target.result;
+    setModalAvatarDisplay(true, ev.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(){
+  profileData.avatarType = "default";
+  profileData.avatarImg = "";
+  setModalAvatarDisplay(false, "");
+  let inp = document.getElementById("avatarUploadInput");
+  if(inp) inp.value = "";
+}
+
+function updateBioCounter(){
+  let v = document.getElementById("editBio")?.value || "";
+  let el = document.getElementById("bioCounter");
+  if(el) el.innerText = v.length;
+}
+
+function openEditProfile(){
+  let nameEl = document.getElementById("editName");
+  let userEl = document.getElementById("editUsername");
+  let bioEl = document.getElementById("editBio");
+  let locEl = document.getElementById("editLocation");
+  let bioCount = document.getElementById("bioCounter");
+  if(nameEl) nameEl.value = profileData.name||"";
+  if(userEl) userEl.value = profileData.username||"";
+  if(bioEl) bioEl.value = profileData.bio||"";
+  if(locEl) locEl.value = profileData.location||"";
+  if(bioCount) bioCount.innerText = (profileData.bio||"").length;
+  setModalAvatarDisplay(profileData.avatarType==="image", profileData.avatarImg);
+  let popup = document.getElementById("editProfilePopup");
+  if(popup) popup.classList.add("show");
+  lockScroll();
+}
+
+function closeEditProfile(){
+  let popup = document.getElementById("editProfilePopup");
+  if(popup) popup.classList.remove("show");
+  unlockScroll();
+}
+
+async function saveProfile(){
+  let name = document.getElementById("editName")?.value.trim();
+  let username = document.getElementById("editUsername")?.value.trim().replace(/[@\s]/g,"");
+  let bio = document.getElementById("editBio")?.value.trim();
+  let location = document.getElementById("editLocation")?.value.trim();
+  if(!name){
+    let nameEl = document.getElementById("editName");
+    if(nameEl) nameEl.focus();
+    showToast("Please enter a name!");
+    return;
+  }
+  profileData.name = name;
+  profileData.bio = bio;
+  profileData.location = location;
+  try{
+    await saveProfileData();
+    closeEditProfile();
+    renderProfile();
+    showToast("Profile updated! ☁️");
+  } catch(e){
+    console.error("Profile update error:", e);
+    showToast("Update failed. Try again.");
+  }
+}
+
+function copyProfileLink(){
+  let name = profileData?.name?.split(" ")[0] || "I";
+let txt = `Hey! ${name} is building daily consistency with Progress Tracker 🚀\n\nTrack your goals, build streaks & achieve more every day!\n\nJoin here → ${window.location.origin}`;  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt)
+      .then(()=>showToast("Invite link copied! Share with friends 🎉"))
+      .catch(()=>showToast("Copy not supported"));
+  } else {
+    showToast("Invite link copied! 🎉");
+  }
+}
+
+function showToast(msg){
+  let t = document.getElementById("toast");
+  let msgEl = document.getElementById("toastMsg");
+  if(!t||!msgEl) return;
+  msgEl.innerText = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2800);
+}
+
+function toggleSidebar(){
+  let s=document.getElementById("sidebar"),o=document.getElementById("overlay");
+  s.classList.toggle("open");o.classList.toggle("show");
+  if(s.classList.contains("open")) lockScroll(); else unlockScroll();
+}
+
+function showLogoutConfirm(){document.getElementById("logoutConfirm").classList.add("show");lockScroll();}
+function closeLogoutConfirm(){document.getElementById("logoutConfirm").classList.remove("show");unlockScroll();}
+async function confirmLogout(){
+  try{ await signOut(auth); } catch(e){}
+  localStorage.removeItem("loggedIn");
+  window.location.href = "login.html";
+}
+
+const sideQuotes=["Small progress every day creates big results.","Stay consistent and never give up.","Discipline leads to success.","Focus on progress, not perfection.","Your future starts today."];
+let sideQIdx=0;
+function rotateSideQuote(){
+  sideQIdx=(sideQIdx+1)%sideQuotes.length;
+  let el=document.getElementById("sideMotivationQuote");
+  if(el){el.style.opacity="0";setTimeout(()=>{el.innerText=sideQuotes[sideQIdx];el.style.opacity="1";},300);}
+}
+setInterval(rotateSideQuote,5000);
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user){ window.location.href="login.html"; return; }
+
+  currentUserId = user.uid;
+
+  try{
+    const userRef = doc(db, "users", currentUserId);
+    const userSnap = await getDoc(userRef);
+
+    if(!userSnap.exists()){
+      profileData = {
+        name: user.displayName || "Progress User",
+        username: user.email ? user.email.split("@")[0] : "user",
+        bio: "",
+        location: "",
+        avatarType: "default",
+        avatarImg: "",
+        status: "active",
+        joinedAt: Date.now()
+      };
+      await setDoc(userRef, profileData);
+    } else {
+      profileData = userSnap.data();
+      if(!profileData.joinedAt) profileData.joinedAt = Date.now();
+      if(!profileData.status) profileData.status = "active";
+      if(!profileData.avatarType) profileData.avatarType = "default";
+      if(!profileData.username || profileData.username === "user") {
+        profileData.username = user.email ? user.email.split("@")[0] : "user";
+        await updateDoc(doc(db,"users",currentUserId), { username: profileData.username });
+      }
+    }
+
+    const q = query(collection(db,"users",currentUserId,"progress"), orderBy("createdAt","desc"));
+    const snap = await getDocs(q);
+    allProgress = [];
+    snap.forEach(d => allProgress.push({ firestoreId: d.id, ...d.data(), data: d.data().data||{} }));
+
+    renderProfile();
+
+  } catch(e){
+    console.error("Profile init error:", e);
+    showToast("Failed to load profile. Check connection.");
+  }
+});
+
+window.toggleSidebar = toggleSidebar;
+window.showLogoutConfirm = showLogoutConfirm;
+window.closeLogoutConfirm = closeLogoutConfirm;
+window.confirmLogout = confirmLogout;
+window.openEditProfile = openEditProfile;
+window.closeEditProfile = closeEditProfile;
+window.saveProfile = saveProfile;
+window.setStatus = setStatus;
+window.handleAvatarUpload = handleAvatarUpload;
+window.removePhoto = removePhoto;
+window.updateBioCounter = updateBioCounter;
+window.copyProfileLink = copyProfileLink;
+window.showToast = showToast;
+</script>
+</body>
+</html>
+fg
